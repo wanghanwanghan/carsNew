@@ -192,8 +192,6 @@ class AdminController extends AdminBase
 
             $geo=(new GeoHash())->encode($lat,$lng,8);
 
-            dd($geo);
-
             //要插入数据了
             $data=[
                 'name'=>$request->name ?? '我是车行',//名称
