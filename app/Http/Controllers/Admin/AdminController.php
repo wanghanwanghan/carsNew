@@ -8,6 +8,7 @@ use App\Http\Models\carInfo;
 use App\Http\Models\carLicenseType;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
+use App\Http\Models\coupon;
 use App\Http\Service\UploadImg;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -125,7 +126,61 @@ class AdminController extends AdminBase
         }
     }
 
+    //创建优惠券
+    public function createCoupon(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
 
+            $couponType=[1=>'自驾',2=>'出行',3=>'摩托'];
+            $discount=[1=>'折扣减免',2=>'金额减免'];
+
+            $res=[
+                'couponType'=>$couponType,
+                'discount'=>$discount,
+            ];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'name'=>$request->name ?? '我是优惠券',//名称
+                'couponType'=>$request->couponType ?? '自驾',//哪种租可以用
+                'needMoney'=>$request->needMoney ?? 500,//多少钱可以用
+                'discountWay'=>$request->discountWay ?? 10,//折扣减免是按%，金额减免是直接减钱
+                'discount'=>$request->discount ?? '折扣减免',//减免方式
+                'expireStart'=>$request->expireStart ?? time(),//有效期开始
+                'expireStop'=>$request->expireStop ?? time(),//有效期结束
+                'phone'=>$request->phone ?? '13800138000',//手机
+                'createdAt'=>$request->createdAt ?? time(),//创建时间
+            ];
+
+            try
+            {
+                $code=200;
+
+                coupon::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+
+
+
+
+
+
+
+
+
+    }
 
 
 
