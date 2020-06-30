@@ -19,12 +19,14 @@ class UploadImg
 
         $year=Carbon::now()->year;
 
+        $filename=control::getUuid(12).$ext;
+
         //这里需要返回的
-        $pathAndName="/static/carImg/{$year}/".control::getUuid(12).$ext;
+        $pathAndName="/static/carImg/{$year}/".$filename;
 
         try
         {
-            $one->move(public_path("/static/carImg/{$year}/"),control::getUuid(12).$ext);
+            $one->move(public_path("/static/carImg/{$year}/"),$filename);
 
         }catch (\Exception $e)
         {
