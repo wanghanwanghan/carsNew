@@ -10,8 +10,6 @@ class AdminController extends AdminBase
     //后台用户登录
     public function login(Request $request)
     {
-
-        dd($request->all());
         $username=$request->username;
         $password=$request->password;
 
@@ -19,6 +17,8 @@ class AdminController extends AdminBase
             'username'=>$username,
             'password'=>$password,
         ])->first();
+
+        dd($check);
 
         return $check === null ?
             response()->json($this->createReturn(201,[],'用户名密码错误')) :
