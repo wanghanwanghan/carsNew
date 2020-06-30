@@ -10,6 +10,7 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Service\UploadImg;
+use Geohash\GeoHash;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -133,8 +134,8 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $couponType=[1=>'自驾',2=>'出行',3=>'摩托'];
-            $discount=[1=>'折扣减免',2=>'金额减免'];
+            $couponType=['自驾','出行','摩托'];
+            $discount=['折扣减免','金额减免'];
 
             $res=[
                 'couponType'=>$couponType,
@@ -171,18 +172,53 @@ class AdminController extends AdminBase
 
             return response()->json($this->createReturn($code));
         }
-
-
-
-
-
-
-
-
-
     }
 
+    //创建车行
+    public function createCarBelong(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
 
+            $res=[];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            $lng=$request->lng ?? '116.3623500000';
+            $lat=$request->lat ?? '39.9733390000';
+
+            $geo=(new GeoHash())->encode($lat,$lng,8);
+
+            //要插入数据了
+            $data=[
+                'name'=>$request->name ?? '我是车行',//名称
+                'lng'=>$lng,//纬度
+                'lat'=>$lat,//经度
+                'geo'=>$geo,//geo
+                'address'=>$request->address ?? '北京市海淀区花园路13号汉太华',//地址
+                'tel'=>$request->tel ?? '12345678',//座机
+                'phone'=>$request->phone ?? '13800138000',//手机
+                'open'=>$request->open ?? '9:00',//开门时间
+                'close'=>$request->close ?? '22:00',//关门时间
+            ];
+
+            try
+            {
+                $code=200;
+
+                carBelong::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
 
 
 
