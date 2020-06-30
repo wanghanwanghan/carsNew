@@ -18,8 +18,6 @@ class AdminController extends AdminBase
             'password'=>$password,
         ])->first();
 
-        dd($check);
-
         return $check === null ?
             response()->json($this->createReturn(201,[],'用户名密码错误')) :
             response()->json($this->createReturn(200,[],'登录成功'));
