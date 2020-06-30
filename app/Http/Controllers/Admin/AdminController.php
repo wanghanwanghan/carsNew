@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Models\carType;
 use App\Http\Service\UploadImg;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -45,6 +46,28 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,$path));
     }
 
+    //创建跑车
+    public function createSportsCar(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
+            $carType=carType::all()->toArray();
+
+
+            dd($carType);
+
+
+        }else
+        {
+            //要插入数据了
+
+
+
+
+
+        }
+    }
 
 
 
