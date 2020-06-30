@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Models\banner;
 use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
@@ -236,14 +237,14 @@ class AdminController extends AdminBase
         {
             //要插入数据了
             $data=[
-                'carBrand'=>$request->carBrand ?? Str::random(8),//名称
+                'carBrand'=>$request->carBrand ?? Str::random(8),//品牌名称
             ];
 
             try
             {
                 $code=200;
 
-                carBelong::create($data);
+                carBrand::create($data);
 
             }catch (\Exception $e)
             {
@@ -254,6 +255,42 @@ class AdminController extends AdminBase
         }
     }
 
+    //创建banner
+    public function createBanner(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
+
+            $res=[];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'image'=>$request->image ?? Str::random(),//图片地址
+                'isShow'=>$request->isShow ?? 1,//是否显示
+                'level'=>$request->level ?? mt_rand(1,100),//权重
+                'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
+                'href'=>$request->href ?? Str::random(),//跳转地址
+            ];
+
+            try
+            {
+                $code=200;
+
+                banner::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
 
 
 
