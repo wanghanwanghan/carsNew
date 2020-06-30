@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Models\carBelong;
+use App\Http\Models\carBrand;
+use App\Http\Models\carLicenseType;
 use App\Http\Models\carType;
+use App\Http\Models\chinaArea;
 use App\Http\Service\UploadImg;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use wanghanwanghan\someUtils\control;
 
 class AdminController extends AdminBase
 {
@@ -52,11 +57,25 @@ class AdminController extends AdminBase
         if ($request->getMethod() === 'GET')
         {
             //刚打开页面
+
             $carType=carType::all()->toArray();
+            $carBrand=carBrand::all()->toArray();
+            $carLicenseType=carLicenseType::all()->toArray();
+            $china_area=chinaArea::all()->toArray();
+            $tmp=[];
+            control::traverseMenu($china_area,$tmp);
+            $china_area=$tmp;
+            $carBelong=carBelong::all()->toArray();
 
+            $res=[
+                'carType'=>$carType,
+                'carBrand'=>$carBrand,
+                'carLicenseType'=>$carLicenseType,
+                'china_area'=>$china_area,
+                'carBelong'=>$carBelong,
+            ];
 
-            dd($carType);
-
+            return response()->json($this->createReturn(200,$res));
 
         }else
         {
@@ -64,8 +83,9 @@ class AdminController extends AdminBase
 
 
 
+            $res=[123];
 
-
+            return response()->json($this->createReturn(200,$res));
         }
     }
 
