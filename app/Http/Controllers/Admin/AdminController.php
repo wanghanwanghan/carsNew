@@ -14,6 +14,7 @@ use Geohash\GeoHash;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
 
 class AdminController extends AdminBase
@@ -220,7 +221,38 @@ class AdminController extends AdminBase
         }
     }
 
+    //创建车辆品牌
+    public function createCarBrand(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
 
+            $res=[];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'carBrand'=>$request->carBrand ?? Str::random(8),//名称
+            ];
+
+            try
+            {
+                $code=200;
+
+                carBelong::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
 
 
 
