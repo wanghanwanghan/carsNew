@@ -38,8 +38,6 @@ class SendSms
 
         $client=new Sms($auth);
 
-        $resp=false;
-
         switch (head($type))
         {
             case 'vCode':
@@ -47,7 +45,7 @@ class SendSms
                 //发送验证码
 
 
-                dd($this->tempId_1,$mobiles,['code'=>last($type)]);
+                dd($client->sendMessage($this->tempId_1,$mobiles,['code'=>last($type)]));
 
                 try
                 {
@@ -55,7 +53,7 @@ class SendSms
 
                 }catch (\Exception $e)
                 {
-
+                    $resp=false;
                 }
 
                 break;
