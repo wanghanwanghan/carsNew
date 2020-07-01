@@ -10,12 +10,13 @@ use App\Http\Models\carLicenseType;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
-use App\Http\Service\SendSms;
 use App\Http\Service\UploadImg;
 use Geohash\GeoHash;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
 
@@ -72,6 +73,7 @@ class AdminController extends AdminBase
             control::traverseMenu($china_area,$tmp);
             $china_area=$tmp;
             $carBelong=carBelong::all()->toArray();
+            $carList=carInfo::all()->toArray();
 
             $res=[
                 'carType'=>$carType,
@@ -79,6 +81,7 @@ class AdminController extends AdminBase
                 'carLicenseType'=>$carLicenseType,
                 'china_area'=>$china_area,
                 'carBelong'=>$carBelong,
+                'carList'=>$carList
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -143,6 +146,7 @@ class AdminController extends AdminBase
             $res=[
                 'couponType'=>$couponType,
                 'discount'=>$discount,
+                'couponList'=>coupon::all()->toArray()
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -184,7 +188,9 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $res=[];
+            $res=[
+                'carBelongList'=>carBelong::all()->toArray()
+            ];
 
             return response()->json($this->createReturn(200,$res));
 
@@ -193,7 +199,7 @@ class AdminController extends AdminBase
             $lng=$request->lng ?? '116.3623500000';
             $lat=$request->lat ?? '39.9733390000';
 
-            $geo=(new GeoHash())->encode($lat,$lng,8);
+            $geo=(new GeoHash())->encode($lat,$lng,12);
 
             //要插入数据了
             $data=[
@@ -230,7 +236,9 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $res=[];
+            $res=[
+                'carBrandList'=>carBrand::all()->toArray()
+            ];
 
             return response()->json($this->createReturn(200,$res));
 
@@ -263,7 +271,9 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $res=[];
+            $res=[
+                'bannerList'=>banner::all()->toArray()
+            ];
 
             return response()->json($this->createReturn(200,$res));
 
@@ -296,4 +306,27 @@ class AdminController extends AdminBase
 
 
 
+
+
+
+
+
+
+    private function createTable()
+    {
+        if (!Schema::hasTable('order'))
+        {
+            Schema::create('order',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->string('lat','15')->comment('纬度');
+                $table->string('lng','15')->comment('精度');
+                $table->string('geo','10')->comment('geohash');
+                $table->integer('unixTime')->unsigned()->comment('unix时间戳')->index();
+                $table->timestamps();
+                $table->unique(['uid','geo']);//insert ignore要用到
+                $table->engine='InnoDB';
+            });
+        }
+    }
 }
