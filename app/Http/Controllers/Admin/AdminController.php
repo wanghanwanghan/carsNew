@@ -10,6 +10,7 @@ use App\Http\Models\carLicenseType;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
+use App\Http\Service\SendSms;
 use App\Http\Service\UploadImg;
 use Geohash\GeoHash;
 use Illuminate\Http\Request;
@@ -262,7 +263,7 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $res=[];
+            $res=SendSms::getInstance()->send(['vCode',mt_rand(100000,999999)]);;
 
             return response()->json($this->createReturn(200,$res));
 
