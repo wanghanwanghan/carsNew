@@ -263,7 +263,7 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $res=SendSms::getInstance()->send(['vCode',mt_rand(100000,999999)],[18618457910]);
+            $res=SendSms::getInstance()->send(['vCode',mt_rand(100000,999999)],['18618457910']);
 
             return response()->json($this->createReturn(200,$res));
 
