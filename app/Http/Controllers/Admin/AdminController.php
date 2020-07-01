@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Models\banner;
+use App\Http\Models\bannerAction;
 use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
@@ -58,6 +59,18 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,$path));
     }
 
+    //算offset
+    private function offset($request)
+    {
+        $page = $request->page ?? 1;
+
+        $pageSize = $request->pageSize ?? 10;
+
+        $offset = ( $page - 1 ) * $pageSize;
+
+        return [$offset,$pageSize];
+    }
+
     //创建跑车
     public function createSportsCar(Request $request)
     {
@@ -73,7 +86,16 @@ class AdminController extends AdminBase
             control::traverseMenu($china_area,$tmp);
             $china_area=$tmp;
             $carBelong=carBelong::all()->toArray();
-            $carList=carInfo::all()->toArray();
+
+            $pageInfo=$this->offset($request);
+
+            $carInfoList=DB::table('carInfo');
+
+            if (!empty($request->carBrand)) $carInfoList->where('carBrand',$request->carBrand);
+
+            $tmp=[];
+            $tmp['list']=$carInfoList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$carInfoList->offset(head($pageInfo))->limit(last($pageInfo))->count();
 
             $res=[
                 'carType'=>$carType,
@@ -81,7 +103,7 @@ class AdminController extends AdminBase
                 'carLicenseType'=>$carLicenseType,
                 'china_area'=>$china_area,
                 'carBelong'=>$carBelong,
-                'carList'=>$carList
+                'carInfoList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -143,10 +165,18 @@ class AdminController extends AdminBase
             $couponType=['自驾','出行','摩托'];
             $discount=['折扣减免','金额减免'];
 
+            $pageInfo=$this->offset($request);
+
+            $couponList=DB::table('coupon');
+
+            $tmp=[];
+            $tmp['list']=$couponList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$couponList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+
             $res=[
                 'couponType'=>$couponType,
                 'discount'=>$discount,
-                'couponList'=>coupon::all()->toArray()
+                'couponList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -188,8 +218,16 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
+            $pageInfo=$this->offset($request);
+
+            $carBelongList=DB::table('carBelong');
+
+            $tmp=[];
+            $tmp['list']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+
             $res=[
-                'carBelongList'=>carBelong::all()->toArray()
+                'carBelongList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -236,8 +274,16 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
+            $pageInfo=$this->offset($request);
+
+            $carBrandList=DB::table('carBrand');
+
+            $tmp=[];
+            $tmp['list']=$carBrandList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$carBrandList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+
             $res=[
-                'carBrandList'=>carBrand::all()->toArray()
+                'carBrandList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -271,8 +317,16 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
+            $pageInfo=$this->offset($request);
+
+            $bannerList=DB::table('banner');
+
+            $tmp=[];
+            $tmp['list']=$bannerList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$bannerList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+
             $res=[
-                'bannerList'=>banner::all()->toArray()
+                'bannerList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -303,6 +357,67 @@ class AdminController extends AdminBase
         }
     }
 
+    //把文章content变成一行一行的，用<p>标签分割
+    private function handleContent($content)
+    {
+        $tmp=[];
+
+        preg_match_all("/\<p(.*)\<\/p\>|\<table(.*)\<\/table\>/Us",$content,$res);
+
+        foreach (head($res) as $one)
+        {
+            array_push($tmp,$one);
+        }
+
+        return $tmp;
+    }
+
+    //创建banner的活动页
+    public function createBannerAction(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
+
+            $pageInfo=$this->offset($request);
+
+            $bannerActionList=DB::table('bannerAction');
+
+            $tmp=[];
+            $tmp['list']=$bannerActionList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$bannerActionList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+
+            $res=[
+                'bannerActionList'=>$tmp
+            ];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'long'=>$request->long ?? Str::random(),//长标题
+                'short'=>$request->short ?? Str::random(),//端标题
+                'content'=>$request->contents ?? Str::random(),//内容富文本
+                'click'=>$request->click ?? 1,//点击量默认是1
+                'createAt'=>$request->createAt ?? time(),//创建时间
+            ];
+
+            try
+            {
+                $code=200;
+
+                bannerAction::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
 
 
 
@@ -314,18 +429,16 @@ class AdminController extends AdminBase
 
     private function createTable()
     {
-        if (!Schema::hasTable('order'))
+        if (!Schema::hasTable('bannerAction'))
         {
-            Schema::create('order',function (Blueprint $table)
+            Schema::create('bannerAction',function (Blueprint $table)
             {
                 $table->increments('id')->unsigned()->comment('主键');
-                $table->string('lat','15')->comment('纬度');
-                $table->string('lng','15')->comment('精度');
-                $table->string('geo','10')->comment('geohash');
-                $table->integer('unixTime')->unsigned()->comment('unix时间戳')->index();
-                $table->timestamps();
-                $table->unique(['uid','geo']);//insert ignore要用到
-                $table->engine='InnoDB';
+                $table->string('long')->comment('长标题');
+                $table->string('short')->comment('短标题');
+                $table->text('contents')->comment('内容');
+                $table->integer('click')->unsigned()->comment('点击量');
+                $table->integer('createAt')->unsigned()->comment('创建时间');
             });
         }
     }
