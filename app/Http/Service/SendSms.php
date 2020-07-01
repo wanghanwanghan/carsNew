@@ -38,14 +38,13 @@ class SendSms
 
         $client=new Sms($auth);
 
+        $resp=false;
+
         switch (head($type))
         {
             case 'vCode':
 
                 //发送验证码
-
-
-                dd($client->sendMessage($this->tempId_1,$mobiles,['code'=>last($type)]));
 
                 try
                 {
