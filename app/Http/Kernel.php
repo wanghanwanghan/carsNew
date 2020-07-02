@@ -16,6 +16,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        HandleCors::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -37,13 +38,11 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            HandleCors::class,
         ],
 
         'api' => [
             'throttle:120,1',
             'bindings',
-            HandleCors::class,
         ],
     ];
 
