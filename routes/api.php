@@ -34,3 +34,20 @@ Route::group(['middleware'=>['testMiddleware'],'prefix'=>'v1'],function ()
 
 
 });
+
+//notify
+Route::group(['middleware'=>['testMiddleware'],'prefix'=>'notify'],function ()
+{
+    Route::match(['get','post'],'wxNotify','Notify\Notify@wxNotify');//微信通知
+
+
+
+
+
+
+
+
+
+
+
+});

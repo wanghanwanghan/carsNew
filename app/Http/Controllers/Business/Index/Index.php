@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business\Index;
 
 use App\Http\Controllers\Business\BusinessBase;
+use App\Http\Models\banner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
@@ -28,6 +29,14 @@ class Index extends BusinessBase
 
     public function index(Request $request)
     {
-        dd($this->globalConf());
+        dd(banner::all()->toArray());
+
+
+
+
+
+        return response()->json($this->createReturn(200,[
+            'globalConf'=>$this->globalConf(),
+        ]));
     }
 }
