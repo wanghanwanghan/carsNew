@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+//admin
 Route::group(['middleware'=>['testMiddleware'],'prefix'=>'admin'],function ()
 {
-    //admin
     Route::match(['get','post'],'login','Admin\AdminController@login');//登录
     Route::match(['get','post'],'uploadImg','Admin\AdminController@uploadImg');//上传图片
     Route::match(['get','post'],'paginate','Admin\AdminController@paginate');//公共分页
@@ -16,14 +16,21 @@ Route::group(['middleware'=>['testMiddleware'],'prefix'=>'admin'],function ()
     Route::match(['get','post'],'create/bannerAction','Admin\AdminController@createBannerAction');//创建banner的活动页
 
 
+});
+
+//business
+Route::group(['middleware'=>['testMiddleware'],'prefix'=>'v1'],function ()
+{
+    Route::match(['get','post'],'index','Business\Index\Index@Index');//首页
 
 
 
 
-    //business
+
+
+
+
 
 
 
 });
-
-
