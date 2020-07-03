@@ -141,6 +141,7 @@ class AdminController extends AdminBase
                 'rentMin'=>$request->rentMin ?? 1,//最小天数
                 'rentMax'=>$request->rentMax ?? 9999,//最大天数
                 'level'=>$request->level ?? 0,//权重
+                'carDesc'=>$request->carDesc ?? '无',//描述
             ];
 
             try

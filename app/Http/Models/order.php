@@ -10,7 +10,5 @@ class order extends Model
 
     protected $table='order';
 
-    public $timestamps=false;
-
     protected $guarded=[];
 }
