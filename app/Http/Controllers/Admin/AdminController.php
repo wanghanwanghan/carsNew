@@ -26,6 +26,8 @@ class AdminController extends AdminBase
     //后台用户登录
     public function login(Request $request)
     {
+        $this->createTable();
+
         $username=$request->username;
         $password=$request->password;
 
@@ -138,6 +140,7 @@ class AdminController extends AdminBase
                 'isActivities'=>$request->isActivities ?? '否',//是否参加活动
                 'rentMin'=>$request->rentMin ?? 1,//最小天数
                 'rentMax'=>$request->rentMax ?? 9999,//最大天数
+                'level'=>$request->level ?? 0,//权重
             ];
 
             try
@@ -439,6 +442,34 @@ class AdminController extends AdminBase
                 $table->text('contents')->comment('内容');
                 $table->integer('click')->unsigned()->comment('点击量');
                 $table->integer('createAt')->unsigned()->comment('创建时间');
+            });
+        }
+
+        if (!Schema::hasTable('order'))
+        {
+            Schema::create('order',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->string('orderId',50)->comment('订单号')->index();
+                $table->string('orderType',50)->comment('自驾/出行/摩托');
+                $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
+                $table->string('account',50)->comment('就是手机号')->index();
+                $table->integer('startTime')->unsigned()->comment('开始时间')->index();
+                $table->integer('stopTime')->unsigned()->comment('结束时间')->index();
+                $table->string('getCarWay',50)->comment('自取/送车');
+                $table->string('getCarPlace')->comment('取车地点');
+                $table->string('rentPersonName',50)->comment('租车人');
+                $table->string('rentPersonPhone',50)->comment('租车电话');
+                $table->integer('carBrand')->unsigned()->comment('品牌id');
+                $table->string('carModel',50)->comment('车辆型号');
+                $table->integer('orderPrice')->unsigned()->comment('订单金额');
+                $table->string('payWay',50)->comment('钱包/微信');
+                $table->string('payment',50)->comment('只交押金/交全款');
+                $table->string('start')->comment('起点');
+                $table->string('destination')->comment('终点');
+                $table->string('hukangfei1')->nullable()->comment('保留字段');
+                $table->string('hukangfei2')->nullable()->comment('保留字段');
+                $table->string('hukangfei3')->nullable()->comment('保留字段');
             });
         }
     }
