@@ -470,6 +470,7 @@ class AdminController extends AdminBase
                 $table->string('hukangfei1')->nullable()->comment('保留字段');
                 $table->string('hukangfei2')->nullable()->comment('保留字段');
                 $table->string('hukangfei3')->nullable()->comment('保留字段');
+                $table->timestamps();
             });
         }
     }
