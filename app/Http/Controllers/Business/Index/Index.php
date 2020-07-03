@@ -25,6 +25,9 @@ class Index extends BusinessBase
         return [$offset,$pageSize];
     }
 
+    //根据timeRange从订单表中取出哪些车被消耗了多少辆
+    //private function
+
     private function globalConf()
     {
         $appName=Redis::hget('globalConf','appName');

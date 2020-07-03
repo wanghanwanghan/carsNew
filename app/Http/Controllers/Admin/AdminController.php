@@ -452,6 +452,7 @@ class AdminController extends AdminBase
             {
                 $table->increments('id')->unsigned()->comment('主键');
                 $table->string('orderId',50)->comment('订单号')->index();
+                $table->integer('carInfoId')->unsigned()->comment('信息表id')->index();
                 $table->string('orderType',50)->comment('自驾/出行/摩托');
                 $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
                 $table->string('account',50)->comment('就是手机号')->index();
