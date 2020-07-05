@@ -8,6 +8,8 @@ use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
 use App\Http\Models\carLicenseType;
+use App\Http\Models\carModel;
+use App\Http\Models\carModelCarBelong;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
@@ -73,8 +75,8 @@ class AdminController extends AdminBase
         return [$offset,$pageSize];
     }
 
-    //创建跑车
-    public function createSportsCar(Request $request)
+    //创建车
+    public function createCar(Request $request)
     {
         if ($request->getMethod() === 'GET')
         {
@@ -82,7 +84,6 @@ class AdminController extends AdminBase
 
             $carType=carType::all()->toArray();
             $carBrand=carBrand::all()->toArray();
-            $carLicenseType=carLicenseType::all()->toArray();
             $china_area=chinaArea::all()->toArray();
             $tmp=[];
             control::traverseMenu($china_area,$tmp);
@@ -91,21 +92,20 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $carInfoList=DB::table('carInfo');
+            $carModelList=DB::table('carModel');
 
-            if (!empty($request->carBrand)) $carInfoList->where('carBrand',$request->carBrand);
+            if (!empty($request->carBrand)) $carModelList->where('carBrand',$request->carBrandId);
 
             $tmp=[];
-            $tmp['list']=$carInfoList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$carInfoList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=$carModelList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=$carModelList->offset(head($pageInfo))->limit(last($pageInfo))->count();
 
             $res=[
                 'carType'=>$carType,
                 'carBrand'=>$carBrand,
-                'carLicenseType'=>$carLicenseType,
                 'china_area'=>$china_area,
                 'carBelong'=>$carBelong,
-                'carInfoList'=>$tmp
+                'carModelList'=>$tmp
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -114,41 +114,47 @@ class AdminController extends AdminBase
         {
             //要插入数据了
             $data=[
-                'images'=>$request->images ?? '无',//车辆图片
-                'carType'=>$request->carType ?? 1,//车辆类型
-                'carBrand'=>$request->carBrand ?? 1,//品牌
                 'carModel'=>$request->carModel ?? '无',//型号
-                'engine'=>$request->engine ?? 1.0,//排量
-                'year'=>$request->year ?? 2020,//年份
-                'carLicenseType'=>$request->carLicenseType ?? 1,//牌照
-                'carBelongCity'=>$request->carBelongCity ?? 1,//所属城市
+                'carImg'=>$request->carImg ?? '无',//车辆图片
+                'carType'=>$request->carType ?? 1,//车辆类型
+                'carBrandId'=>$request->carBrandId ?? 1,//品牌
+                'engine'=>$request->engine ?? '2.0',//排量
+                'year'=>$request->year ?? '2020',//年份
                 'operateType'=>$request->carBelongCity ?? '自动挡',//操作模式
                 'seatNum'=>$request->seatNum ?? 2,//座位个数
                 'driveType'=>$request->driveType ?? '四驱',//驱动方式
-                'isRoadster'=>$request->isRoadster ?? '否',//是否敞
+                'isRoadster'=>$request->isRoadster ?? 0,//是否敞
                 'carColor'=>$request->carColor ?? '钻石白',//外观颜色
                 'insideColor'=>$request->insideColor ?? '尊贵棕',//内饰颜色
+                'carDesc'=>$request->carDesc ?? '无',//描述
+                'rentMin'=>$request->rentMin ?? 1,//最小天数
+                'rentMax'=>$request->rentMax ?? 9999,//最大天数
+                'level'=>$request->level ?? 0,//权重
+                'damagePrice'=>$request->damagePrice ?? 20000,//车损押金
+                'forfeitPrice'=>$request->forfeitPrice ?? 2000,//违章押金
+                'isActivities'=>$request->isActivities ?? 0,//是否参加活动
                 'dayPrice'=>$request->dayPrice ?? 5000,//日租价格
                 'dayDiscount'=>$request->dayDiscount ?? 10,//日租折扣
                 'goPrice'=>$request->goPrice ?? 3000,//出行价格
                 'goDiscount'=>$request->goDiscount ?? 10,//出行折扣
-                'kilPrice'=>$request->kilPrice ?? 20.0,//每公里价格
-                'carNum'=>$request->carNum ?? 20,//库存剩余
-                'carBelong'=>$request->carBelong ?? 1,//所属车行
-                'damagePrice'=>$request->damagePrice ?? 20000,//车损押金
-                'forfeitPrice'=>$request->forfeitPrice ?? 2000,//违章押金
-                'isActivities'=>$request->isActivities ?? '否',//是否参加活动
-                'rentMin'=>$request->rentMin ?? 1,//最小天数
-                'rentMax'=>$request->rentMax ?? 9999,//最大天数
-                'level'=>$request->level ?? 0,//权重
-                'carDesc'=>$request->carDesc ?? '无',//描述
+                'kilPrice'=>$request->kilPrice ?? 20,//每公里价格
             ];
 
             try
             {
                 $code=200;
 
-                carInfo::create($data);
+                $id=(carModel::create($data))->id;
+
+                $arr=json_decode($request->carBelongArr);
+
+                foreach ($arr as &$one)
+                {
+                    $one['carModelId']=$id;
+                }
+                unset($one);
+
+                DB::table('carModelCarBelong')->insert($arr);
 
             }catch (\Exception $e)
             {
@@ -254,6 +260,7 @@ class AdminController extends AdminBase
                 'phone'=>$request->phone ?? '13800138000',//手机
                 'open'=>$request->open ?? '9:00',//开门时间
                 'close'=>$request->close ?? '22:00',//关门时间
+                'cityId'=>$request->cityId ?? 1,//所属城市
             ];
 
             try
@@ -433,6 +440,122 @@ class AdminController extends AdminBase
 
     private function createTable()
     {
+        //不用动
+        //品牌表
+        if (!Schema::hasTable('carBrand')) {}
+
+        //牌照表
+        //不用动
+        if (!Schema::hasTable('carLicenseType')) {}
+
+        //车辆型号
+        if (!Schema::hasTable('carModel'))
+        {
+            Schema::create('carModel',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->string('carModel',30)->comment('车辆型号');
+                $table->text('carImg')->comment('车辆图片');
+                $table->integer('carType')->unsigned()->comment('车辆类型表id');
+                $table->integer('carBrandId')->unsigned()->comment('车辆品牌表id');
+                $table->string('engine',30)->comment('发动机排量');
+                $table->string('year',30)->comment('年份');
+                $table->string('operateType',30)->comment('档位模式');
+                $table->string('seatNum',30)->comment('座位个数');
+                $table->string('driveType',30)->comment('驱动模式');
+                $table->tinyInteger('isRoadster')->unsigned()->comment('是否敞篷');
+                $table->string('carColor',30)->comment('车辆颜色');
+                $table->string('insideColor',30)->comment('内饰颜色');
+                $table->string('carDesc')->comment('描述');
+                $table->integer('rentMin')->unsigned()->comment('最短天数');
+                $table->integer('rentMax')->unsigned()->comment('最长天数');
+                $table->integer('level')->unsigned()->comment('权重');
+                $table->integer('damagePrice')->unsigned()->comment('车损押金');
+                $table->integer('forfeitPrice')->unsigned()->comment('违章押金');
+                $table->tinyInteger('isActivities')->unsigned()->comment('是否参加活动');
+                $table->integer('dayPrice')->unsigned()->comment('日租价格');
+                $table->integer('dayDiscount')->unsigned()->comment('日租折扣');
+                $table->integer('goPrice')->unsigned()->comment('出行价格');
+                $table->integer('goDiscount')->unsigned()->comment('出行折扣');
+                $table->integer('kilPrice')->unsigned()->comment('每公里价格');
+            });
+        }
+
+        //标签表
+        if (!Schema::hasTable('carLabel'))
+        {
+            Schema::create('carLabel',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->string('label',30)->comment('标签名称');
+            });
+        }
+
+        //车型-标签关联表
+        if (!Schema::hasTable('carModelLabel'))
+        {
+            Schema::create('carModelLabel',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->integer('carModelId')->unsigned()->comment('车型表id');
+                $table->integer('carLabelId')->unsigned()->comment('标签表id');
+            });
+        }
+
+        //车型-车行关联表
+        if (!Schema::hasTable('carModelCarBelong'))
+        {
+            Schema::create('carModelCarBelong',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->integer('carModelId')->unsigned()->comment('车辆型号表id');
+                $table->integer('carBelongId')->unsigned()->comment('车行表id');
+                $table->integer('carNum')->unsigned()->comment('车辆库存');
+            });
+        }
+
+        //车行-牌照关联表
+        if (!Schema::hasTable('carBelongLicenseType'))
+        {
+            Schema::create('carBelongLicenseType',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->integer('carBelongId')->unsigned()->comment('车行表id');
+                $table->integer('carLicenseTypeId')->unsigned()->comment('车辆牌照表id');
+            });
+        }
+
+        //车行表
+        if (!Schema::hasTable('carBelong'))
+        {
+            Schema::create('carBelong',function (Blueprint $table)
+            {
+                $table->increments('id')->unsigned()->comment('主键');
+                $table->string('name',30)->comment('车行名称');
+                $table->string('lng',30)->comment('经度');
+                $table->string('lat',30)->comment('纬度');
+                $table->string('geo',30)->comment('geo');
+                $table->integer('cityId')->unsigned()->comment('城市表id');
+                $table->string('address')->comment('地址');
+                $table->string('tel',30)->comment('座机');
+                $table->string('phone',30)->comment('手机');
+                $table->string('open',30)->comment('营业时间');
+                $table->string('close',30)->comment('打烊时间');
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
         if (!Schema::hasTable('bannerAction'))
         {
             Schema::create('bannerAction',function (Blueprint $table)
@@ -452,7 +575,8 @@ class AdminController extends AdminBase
             {
                 $table->increments('id')->unsigned()->comment('主键');
                 $table->string('orderId',50)->comment('订单号')->index();
-                $table->integer('carInfoId')->unsigned()->comment('信息表id')->index();
+                $table->integer('carModelId')->unsigned()->comment('车辆类型表id')->index();
+                $table->integer('carBelongId')->unsigned()->comment('车行表id')->index();
                 $table->string('orderType',50)->comment('自驾/出行/摩托');
                 $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
                 $table->string('account',50)->comment('就是手机号')->index();
@@ -462,8 +586,6 @@ class AdminController extends AdminBase
                 $table->string('getCarPlace')->comment('取车地点');
                 $table->string('rentPersonName',50)->comment('租车人');
                 $table->string('rentPersonPhone',50)->comment('租车电话');
-                $table->integer('carBrand')->unsigned()->comment('品牌id');
-                $table->string('carModel',50)->comment('车辆型号');
                 $table->integer('orderPrice')->unsigned()->comment('订单金额');
                 $table->string('payWay',50)->comment('钱包/微信');
                 $table->string('payment',50)->comment('只交押金/交全款');

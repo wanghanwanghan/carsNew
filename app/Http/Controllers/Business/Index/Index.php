@@ -7,9 +7,12 @@ use App\Http\Models\banner;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
 use App\Http\Models\chinaArea;
+use App\Http\Models\order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use wanghanwanghan\someUtils\control;
 
 class Index extends BusinessBase
 {
@@ -26,8 +29,57 @@ class Index extends BusinessBase
     }
 
     //根据timeRange从订单表中取出哪些车被消耗了多少辆
-    //private function
+    private function getCarInfoIdByTimeRange($start,$stop,$orderType=['自驾','出行','摩托'])
+    {
+        //首先要根据timeRange从表中查出，每种车，有多少被预定了
+        $carOrder=order::where(function ($q) use ($start,$stop){
+            $q->where(function ($query) use ($start){
+                $query->where('startTime','<=',$start)->where('stopTime','>=',$start);
+            })->OrWhere(function ($query) use ($start,$stop){
+                $query->where('startTime','>=',$start)->where('stopTime','<=',$stop);
+            })->OrWhere(function ($query) use ($stop){
+                $query->where('startTime','<=',$stop)->where('stopTime','>=',$stop);
+            })->OrWhere(function ($query) use ($start,$stop){
+                $query->where('startTime','<=',$start)->where('stopTime','>=',$stop);
+            });
+        })
+            ->whereIn('orderType',$orderType)
+            ->whereIn('orderStatus',['待确认','已确认'])
+            ->groupBy('carInfoId')->select(DB::raw('carInfoId,count(1) as num'))->get()->toArray();
 
+        if (in_array('摩托',$orderType))
+        {
+            $carInfo=carInfo::get(['id','carNum'])->toArray();
+        }else
+        {
+            $carInfo=carInfo::whereIn('carType',[1,2])->get(['id','carNum'])->toArray();
+        }
+
+        //整理数组
+        $carId=[];
+
+        foreach ($carInfo as $one)
+        {
+            $carId[$one['id']]=$one['carNum'];
+        }
+
+        //得到在这段时间内所有，有订单的车，然后判断有没有超过库存
+
+        foreach ($carOrder as $one)
+        {
+            if (!isset($carId[$one['carInfoId']])) continue;
+
+            //租出去的数量，大于等于库存
+            if ($one['num'] >= $carId[$one['carInfoId']])
+            {
+                unset($carId[$one['carInfoId']]);
+            }
+        }
+
+        return array_keys($carId);
+    }
+
+    //返回全局变量
     private function globalConf()
     {
         $appName=Redis::hget('globalConf','appName');
@@ -46,6 +98,7 @@ class Index extends BusinessBase
         ];
     }
 
+    //小程序进入首页
     public function index(Request $request)
     {
         $module=[
@@ -100,6 +153,7 @@ class Index extends BusinessBase
         ]));
     }
 
+    //分配模块
     public function moduleDispatch(Request $request)
     {
         preg_match('/\d+/',last(explode('/',$request->path())),$res);
@@ -136,6 +190,35 @@ class Index extends BusinessBase
     //酷享自驾
     private function module1(Request $request)
     {
+//        for ($i=10;$i--;)
+//        {
+//            order::create([
+//                'orderId'=>control::getUuid(),
+//                'carInfoId'=>mt_rand(5,6),
+//                'orderType'=>'自驾',
+//                'orderStatus'=>'已确认',
+//                'account'=>'13800138000',
+//                'startTime'=>time(),
+//                'stopTime'=>time(),
+//                'getCarWay'=>'自取',
+//                'getCarPlace'=>'北京市海淀区西直门内大街101号',
+//                'rentPersonName'=>'超',
+//                'rentPersonPhone'=>'13800138000',
+//                'carBrand'=>carBrand::find(mt_rand(1,14))->carBrand,
+//                'carModel'=>'s350',
+//                'orderPrice'=>mt_rand(100,900),
+//                'payWay'=>'微信',
+//                'payment'=>'全款',
+//                'start'=>'起点是廊坊',
+//                'destination'=>'终点是西直门',
+//            ]);
+//        }
+//        dd(123);
+
+        $start=$request->start ?? 1111111111;
+        $stop=$request->stop ?? 9999999999;
+        $orderType=['自驾','出行'];
+
         $carBelongCity=carInfo::groupBy('carBelongCity')->get(['carBelongCity'])->toArray();
 
         $carBelongCity=Arr::flatten($carBelongCity);
@@ -147,7 +230,10 @@ class Index extends BusinessBase
         //下面要取车辆信息了
         $carBelongCity=$request->carBelongCity ?? 1;
 
-        $carInfo=carInfo::where('carBelongCity',$carBelongCity);
+        //找出有空闲的车辆
+        $carInfoId=$this->getCarInfoIdByTimeRange($start,$stop,$orderType);
+
+        $carInfo=carInfo::where('carBelongCity',$carBelongCity)->whereIn('id',$carInfoId);
 
         //搜索品牌或型号
         $cond=$request->cond;
@@ -192,6 +278,12 @@ class Index extends BusinessBase
     //尊享出行
     private function module2(Request $request)
     {
+        //车辆没有库存限制
+        //取出所有出行属性的车
+        $carInfo=carInfo::whereIn('carType',[1,2])->get()->toArray();
+
+
+        dd(123,$carInfo);
 
     }
 
