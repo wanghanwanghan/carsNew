@@ -6,6 +6,7 @@ use App\Http\Controllers\Business\BusinessBase;
 use App\Http\Models\banner;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
+use App\Http\Models\carModel;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use Illuminate\Http\Request;
@@ -190,75 +191,48 @@ class Index extends BusinessBase
     //酷享自驾
     private function module1(Request $request)
     {
-//        for ($i=10;$i--;)
-//        {
-//            order::create([
-//                'orderId'=>control::getUuid(),
-//                'carInfoId'=>mt_rand(5,6),
-//                'orderType'=>'自驾',
-//                'orderStatus'=>'已确认',
-//                'account'=>'13800138000',
-//                'startTime'=>time(),
-//                'stopTime'=>time(),
-//                'getCarWay'=>'自取',
-//                'getCarPlace'=>'北京市海淀区西直门内大街101号',
-//                'rentPersonName'=>'超',
-//                'rentPersonPhone'=>'13800138000',
-//                'carBrand'=>carBrand::find(mt_rand(1,14))->carBrand,
-//                'carModel'=>'s350',
-//                'orderPrice'=>mt_rand(100,900),
-//                'payWay'=>'微信',
-//                'payment'=>'全款',
-//                'start'=>'起点是廊坊',
-//                'destination'=>'终点是西直门',
-//            ]);
-//        }
-//        dd(123);
+        $city=$request->city ?? 1;
+        $lng=$request->lng ?? '';
+        $lat=$request->lat ?? '';
+        $cond=$request->cond ?? '';//搜索条件
+        $start=$request->start ?? '';
+        $stop=$request->stop ?? '';
+        $orderBy=$request->orderBy ?? 1;
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 10;
+        $orderType=['自驾'];
 
-        $start=$request->start ?? 1111111111;
-        $stop=$request->stop ?? 9999999999;
-        $orderType=['自驾','出行'];
+        if (empty($lng) || empty($lat))
+        {
+            //展示所有车型
 
-        $carBelongCity=carInfo::groupBy('carBelongCity')->get(['carBelongCity'])->toArray();
 
-        $carBelongCity=Arr::flatten($carBelongCity);
 
-        $carBelongCity=chinaArea::whereIn('id',$carBelongCity)->get(['id','name'])->toArray();
 
-        $res['carBelongCity']=$carBelongCity;
 
-        //下面要取车辆信息了
-        $carBelongCity=$request->carBelongCity ?? 1;
 
-        //找出有空闲的车辆
-        $carInfoId=$this->getCarInfoIdByTimeRange($start,$stop,$orderType);
+        }else
+        {
 
-        $carInfo=carInfo::where('carBelongCity',$carBelongCity)->whereIn('id',$carInfoId);
+        }
 
-        //搜索品牌或型号
-        $cond=$request->cond;
 
-        $carBrand=carBrand::where('carBrand','like',"%{$cond}%")->get(['id'])->toArray();
 
-        $carBrand=Arr::flatten($carBrand);
 
-        $carInfo->where(function ($query) use ($carBrand,$cond) {
-            $query->whereIn('carBrand',$carBrand)->orWhere('carModel','like',"%{$cond}%");
-        });
+
+
+
 
         switch ($request->orderBy)
         {
             case 1:
                 //根据权重排序
-                $carInfo->orderBy('level','desc');
                 break;
             case 2:
                 //价格desc
-                $carInfo->orderBy('dayPrice','desc');
                 break;
             case 3:
                 //价格asc
-                $carInfo->orderBy('dayPrice');
                 break;
             case 4:
                 //根据订单量
@@ -267,10 +241,10 @@ class Index extends BusinessBase
             default:
         }
 
-        $carInfo=$carInfo->paginate($request->pageSize??10,['*'],'',$request->page??1)->toArray();
+        //$carInfo=$carInfo->paginate($request->pageSize??10,['*'],'',$request->page??1)->toArray();
 
-        $res['list']=$carInfo['data'];
-        $res['total']=$carInfo['total'];
+        //$res['list']=$carInfo['data'];
+        //$res['total']=$carInfo['total'];
 
         return $res;
     }
