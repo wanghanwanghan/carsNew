@@ -458,21 +458,10 @@ class AdminController extends AdminBase
                 $table->text('carImg')->comment('车辆图片');
                 $table->integer('carType')->unsigned()->comment('车辆类型表id');
                 $table->integer('carBrandId')->unsigned()->comment('车辆品牌表id');
-                $table->string('engine',30)->comment('发动机排量');
-                $table->string('year',30)->comment('年份');
-                $table->string('operateType',30)->comment('档位模式');
-                $table->string('seatNum',30)->comment('座位个数');
-                $table->string('driveType',30)->comment('驱动模式');
-                $table->tinyInteger('isRoadster')->unsigned()->comment('是否敞篷');
-                $table->string('carColor',30)->comment('车辆颜色');
-                $table->string('insideColor',30)->comment('内饰颜色');
                 $table->string('carDesc')->comment('描述');
-                $table->integer('rentMin')->unsigned()->comment('最短天数');
-                $table->integer('rentMax')->unsigned()->comment('最长天数');
                 $table->integer('level')->unsigned()->comment('权重');
                 $table->integer('damagePrice')->unsigned()->comment('车损押金');
                 $table->integer('forfeitPrice')->unsigned()->comment('违章押金');
-                $table->tinyInteger('isActivities')->unsigned()->comment('是否参加活动');
                 $table->integer('dayPrice')->unsigned()->comment('日租价格');
                 $table->integer('dayDiscount')->unsigned()->comment('日租折扣');
                 $table->integer('goPrice')->unsigned()->comment('出行价格');
@@ -511,17 +500,6 @@ class AdminController extends AdminBase
                 $table->integer('carModelId')->unsigned()->comment('车辆型号表id');
                 $table->integer('carBelongId')->unsigned()->comment('车行表id');
                 $table->integer('carNum')->unsigned()->comment('车辆库存');
-            });
-        }
-
-        //车行-牌照关联表
-        if (!Schema::hasTable('carBelongLicenseType'))
-        {
-            Schema::create('carBelongLicenseType',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->integer('carBelongId')->unsigned()->comment('车行表id');
-                $table->integer('carLicenseTypeId')->unsigned()->comment('车辆牌照表id');
             });
         }
 
