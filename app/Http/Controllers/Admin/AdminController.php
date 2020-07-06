@@ -221,11 +221,17 @@ class AdminController extends AdminBase
 
             $carBelongList=DB::table('carBelong');
 
+            $china_area=chinaArea::all()->toArray();
+            $tmp=[];
+            control::traverseMenu($china_area,$tmp);
+            $china_area=$tmp;
+
             $tmp=[];
             $tmp['list']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
             $tmp['total']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->count();
 
             $res=[
+                'china_area'=>$china_area,
                 'carBelongList'=>$tmp
             ];
 
