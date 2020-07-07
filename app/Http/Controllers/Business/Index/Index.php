@@ -457,5 +457,16 @@ class Index extends BusinessBase
 
     }
 
+    //根据城市id，返回所有车行信息
+    public function allCarBelongInCity(Request $request)
+    {
+        $cityId=$request->cityId;
+
+        $carBelongInfo=carBelong::where('cityId',$cityId)->get()->toArray();
+
+        return response()->json($this->createReturn(200,$carBelongInfo));
+    }
+
+
 
 }

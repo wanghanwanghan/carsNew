@@ -37,6 +37,7 @@ Route::group(['prefix'=>'v1'],function ()
     Route::match(['get','post'],'getVerificationCode','Business\Index\Index@getVerificationCode');//获取验证码
     Route::match(['get','post'],'unLogin','Business\Index\Index@unLogin');//退出登录
     Route::match(['get','post'],'login','Business\Index\Index@login');//登录
+    Route::match(['get','post'],'allCarBelongInCity','Business\Index\Index@allCarBelongInCity');//这个城市所有的门店
     Route::match(['get','post'],'module{id}','Business\Index\Index@moduleDispatch')->where('id','[1-6]{1}');//6个模块登录
 
 
