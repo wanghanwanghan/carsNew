@@ -363,36 +363,6 @@ class Index extends BusinessBase
 
     }
 
-    //注册
-    public function reg(Request $request)
-    {
-        $phone=$request->phone;
-
-        $vCode=$request->vCode;
-
-        if (!is_numeric($phone) || strlen($phone) !== 11) return response()->json($this->createReturn(201,[],'手机号码错误'));
-
-        if (empty($vCode)) return response()->json($this->createReturn(201,[],'验证码错误'));
-
-        $userInfo=DB::table('users')->where('phone',$phone)->first();
-
-        if (!empty($userInfo)) return response()->json($this->createReturn(201,[],'手机号码已注册'));
-
-        $vCodeInRedis=Redis::get("reg_{$phone}");
-
-        if ($vCode != $vCodeInRedis) return response()->json($this->createReturn(201,[],'验证码错误'));
-
-        $date=Carbon::now()->format('Y-m-d H:i:s');
-
-        DB::table('users')->insert(['phone'=>$phone,'created_at'=>$date,'updated_at'=>$date]);
-
-        $token=control::getUuid();
-
-        Redis::hset('auth',$phone,$token);
-
-        return response()->json($this->createReturn(200,['token'=>$token],'注册成功'));
-    }
-
     //登录
     public function login(Request $request)
     {
@@ -404,15 +374,27 @@ class Index extends BusinessBase
 
         if (empty($vCode)) return response()->json($this->createReturn(201,[],'验证码错误'));
 
-        $userInfo=DB::table('users')->where('phone',$phone)->first();
-
-        if (empty($userInfo)) return response()->json($this->createReturn(201,[],'手机号码未注册'));
-
         $vCodeInRedis=Redis::get("login_{$phone}");
 
         if ($vCode != $vCodeInRedis) return response()->json($this->createReturn(201,[],'验证码错误'));
 
         $token=control::getUuid();
+
+        $userInfo=DB::table('users')->where('phone',$phone)->first();
+
+        if (empty($userInfo))
+        {
+            //注册
+            DB::table('users')->insert([
+                'phone'=>$phone,
+                'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+
+        }else
+        {
+            //登录
+        }
 
         Redis::hset('auth',$phone,$token);
 
@@ -434,9 +416,6 @@ class Index extends BusinessBase
 
         switch ($type)
         {
-            case 'reg':
-                $key="reg_{$phone}";
-                break;
             case 'login':
                 $key="login_{$phone}";
                 break;
