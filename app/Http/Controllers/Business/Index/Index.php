@@ -290,7 +290,6 @@ class Index extends BusinessBase
                 case 4:
                     //根据订单量
                     break;
-
                 default:
             }
 
@@ -306,12 +305,15 @@ class Index extends BusinessBase
     //尊享出行
     private function module2(Request $request)
     {
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 5;
+
         //车辆没有库存限制
         //取出所有出行属性的车
-        $carInfo=carInfo::whereIn('carType',[1,2])->get()->toArray();
+        $carInfo=carModel::whereIn('carType',[1,2])->get()->toArray();
 
 
-        dd(123,$carInfo);
+        dd($carInfo);
 
     }
 

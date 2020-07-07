@@ -26,12 +26,7 @@
 地址:https://jikecardata.bobocar.cn/api/v1/module2
 方法:get/post
 参数:
-     carBelongCity = 1，城市id
-     start = 1593843664，时间范围，开始时间
-     stop = 1593843664，时间范围，结束时间
-     cond = 奔驰，查询条件字符串
-     orderBy = 1，排序规则，1是推荐排序，2是价格desc，3是价格asc，4是热度排序
      page = 1
-     pageSize = 10
+     pageSize = 5
 ======================================================================================================
 
