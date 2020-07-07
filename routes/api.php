@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 //admin
-Route::group(['middleware'=>['testMiddleware'],'prefix'=>'admin'],function ()
+Route::group(['prefix'=>'admin'],function ()
 {
     Route::match(['get','post'],'login','Admin\AdminController@login');//登录
     Route::match(['get','post'],'uploadImg','Admin\AdminController@uploadImg');//上传图片
@@ -19,10 +19,19 @@ Route::group(['middleware'=>['testMiddleware'],'prefix'=>'admin'],function ()
 });
 
 //business
-Route::group(['middleware'=>['testMiddleware'],'prefix'=>'v1'],function ()
+Route::group(['prefix'=>'v1'],function ()
 {
+    //需要登录的
+    Route::group(['middleware'=>['testMiddleware']],function ()
+    {
+
+    });
+
     Route::match(['get','post'],'index','Business\Index\Index@Index');//首页
     Route::match(['get','post'],'cityList','Business\Index\Index@cityList');//城市列表
+    Route::match(['get','post'],'getVerificationCode','Business\Index\Index@getVerificationCode');//获取验证码
+    Route::match(['get','post'],'reg','Business\Index\Index@reg');//注册
+    Route::match(['get','post'],'login','Business\Index\Index@login');//登录
     Route::match(['get','post'],'module{id}','Business\Index\Index@moduleDispatch')->where('id','[1-6]{1}');//6个模块登录
 
 
@@ -38,7 +47,7 @@ Route::group(['middleware'=>['testMiddleware'],'prefix'=>'v1'],function ()
 });
 
 //notify
-Route::group(['middleware'=>['testMiddleware'],'prefix'=>'notify'],function ()
+Route::group(['prefix'=>'notify'],function ()
 {
     Route::match(['get','post'],'wxNotify','Notify\Notify@wxNotify');//微信通知
 

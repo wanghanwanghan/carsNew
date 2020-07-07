@@ -11,10 +11,15 @@ use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
+use App\Http\Service\SendSms;
+use Carbon\Carbon;
+use http\Env\Response;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
 
@@ -110,14 +115,11 @@ class Index extends BusinessBase
     //返回全局变量
     private function globalConf()
     {
-        $appName=Redis::hget('globalConf','appName');
-        $appName=$appName == null ? '超酷的名字' : $appName;
+        $appName=Redis::hget('globalConf','appName') ?? '超酷的名字';
 
-        $logo=Redis::hget('globalConf','logo');
-        $logo=$logo == null ? '/static/logo/miniLogo.png' : $logo;
+        $logo=Redis::hget('globalConf','logo') ?? '/static/logo/wx_logo.png';
 
-        $tel=Redis::hget('globalConf','tel');
-        $tel=$tel == null ? '4008-517-517' : $tel;
+        $tel=Redis::hget('globalConf','tel') ?? '4008-517-517';
 
         return [
             'appName'=>$appName,
@@ -361,8 +363,91 @@ class Index extends BusinessBase
 
     }
 
+    //注册
+    public function reg(Request $request)
+    {
+        $phone=$request->phone;
 
+        $vCode=$request->vCode;
 
+        if (!is_numeric($phone) || strlen($phone) !== 11) return response()->json($this->createReturn(201,[],'手机号码错误'));
+
+        if (empty($vCode)) return response()->json($this->createReturn(201,[],'验证码错误'));
+
+        $userInfo=DB::table('users')->where('phone',$phone)->first();
+
+        if (!empty($userInfo)) return response()->json($this->createReturn(201,[],'手机号码已注册'));
+
+        $vCodeInRedis=Redis::get("reg_{$phone}");
+
+        if ($vCode != $vCodeInRedis) return response()->json($this->createReturn(201,[],'验证码错误'));
+
+        $date=Carbon::now()->format('Y-m-d H:i:s');
+
+        DB::table('users')->insert(['phone'=>$phone,'created_at'=>$date,'updated_at'=>$date]);
+
+        $token=control::getUuid();
+
+        Redis::hset('auth',$phone,$token);
+
+        return response()->json($this->createReturn(200,['token'=>$token],'注册成功'));
+    }
+
+    //登录
+    public function login(Request $request)
+    {
+        $phone=$request->phone;
+
+        $vCode=$request->vCode;
+
+        if (!is_numeric($phone) || strlen($phone) !== 11) return response()->json($this->createReturn(201,[],'手机号码错误'));
+
+        if (empty($vCode)) return response()->json($this->createReturn(201,[],'验证码错误'));
+
+        $userInfo=DB::table('users')->where('phone',$phone)->first();
+
+        if (empty($userInfo)) return response()->json($this->createReturn(201,[],'手机号码未注册'));
+
+        $vCodeInRedis=Redis::get("login_{$phone}");
+
+        if ($vCode != $vCodeInRedis) return response()->json($this->createReturn(201,[],'验证码错误'));
+
+        $token=control::getUuid();
+
+        Redis::hset('auth',$phone,$token);
+
+        return response()->json($this->createReturn(200,['token'=>$token],'登录成功'));
+    }
+
+    //获取验证码
+    public function getVerificationCode(Request $request)
+    {
+        $phone=(string)$request->phone;
+
+        $type=$request->type;
+
+        if (!is_numeric($phone) || strlen($phone) !== 11 || empty($type)) return response()->json($this->createReturn(201,[],'参数'));
+
+        $code=mt_rand(100000,999999);
+
+        SendSms::getInstance()->send(['vCode',$code],[$phone]);
+
+        switch ($type)
+        {
+            case 'reg':
+                $key="reg_{$phone}";
+                break;
+            case 'login':
+                $key="login_{$phone}";
+                break;
+            default:
+        }
+
+        Redis::set($key,$code);
+        Redis::expire($key,300);
+
+        return response()->json($this->createReturn(200,[],'发送成功'));
+    }
 
 
 }
