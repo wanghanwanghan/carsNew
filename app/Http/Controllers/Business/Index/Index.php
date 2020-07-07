@@ -13,7 +13,6 @@ use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use App\Http\Service\SendSms;
 use Carbon\Carbon;
-use http\Env\Response;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -28,10 +27,9 @@ class Index extends BusinessBase
     //城市列表
     public function cityList(Request $request)
     {
-        $china_area=chinaArea::all()->toArray();
-        $tmp=[];
-        control::traverseMenu($china_area,$tmp);
-        $china_area=$tmp;
+        $carBelongId=carBelong::groupBy('cityId')->pluck('cityId')->toArray();
+
+        $china_area=chinaArea::whereIn('id',$carBelongId)->get()->toArray();
 
         return response()->json($this->createReturn(200,$china_area));
     }
@@ -437,6 +435,26 @@ class Index extends BusinessBase
         Redis::expire($key,300);
 
         return response()->json($this->createReturn(200,[],'发送成功'));
+    }
+
+    //获取车辆详情
+    public function carDetail(Request $request)
+    {
+        $carModelId=$request->carModelId;
+
+        $carBelongId=$request->carBelongId;
+
+        $carDetail=carModel::where('id',$carModelId)->first();
+
+        $carBelongDetail=carBelong::where('id',$carBelongId)->first();
+
+
+
+        dd($carDetail,$carBelongDetail);
+
+
+
+
     }
 
 

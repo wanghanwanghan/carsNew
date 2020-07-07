@@ -24,7 +24,8 @@ Route::group(['prefix'=>'v1'],function ()
     //需要登录的
     Route::group(['middleware'=>['testMiddleware']],function ()
     {
-        Route::match(['get','post'],'index','Business\Index\Index@Index');//首页
+        Route::match(['get','post'],'carDetail','Business\Index\Index@carDetail');//车辆详情
+        Route::match(['get','post'],'readyToBook','Business\Index\Index@readyToBook');//准备预定
 
 
 
