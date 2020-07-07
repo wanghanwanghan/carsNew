@@ -135,7 +135,7 @@ class AdminController extends AdminBase
 
                 $id=(carModel::create($data))->id;
 
-                $arr=json_decode($request->carBelongArr);
+                $arr=json_decode($request->carBelongArr,true);
 
                 foreach ($arr as &$one)
                 {
