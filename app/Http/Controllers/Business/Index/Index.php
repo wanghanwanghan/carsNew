@@ -122,42 +122,42 @@ class Index extends BusinessBase
             [
                 'name'=>'酷享自驾',
                 'subtext'=>['你想要的','都在这里'],
-                'img'=>Redis::hget('globalConf','module1') ?? '',
+                'img'=>Redis::hget('globalConf','module1') ?? '/static/carImg/2020/8be594ba12b6.png',
                 'href'=>'/v1/module1',
                 'isNew'=>true,
             ],
             [
                 'name'=>'尊享出行',
                 'subtext'=>['专人专车','一应俱全'],
-                'img'=>Redis::hget('globalConf','module2') ?? '',
+                'img'=>Redis::hget('globalConf','module2') ?? '/static/carImg/2020/3650457923e4.png',
                 'href'=>'/v1/module2',
                 'isNew'=>false,
             ],
             [
                 'name'=>'急速摩托',
                 'subtext'=>['追求极致','畅快淋漓'],
-                'img'=>Redis::hget('globalConf','module3') ?? '',
+                'img'=>Redis::hget('globalConf','module3') ?? '/static/carImg/2020/b7ebcc68ab2c.png',
                 'href'=>'/v1/module3',
                 'isNew'=>false,
             ],
             [
                 'name'=>'安心托管',
                 'subtext'=>['追求极致','畅快淋漓'],
-                'img'=>Redis::hget('globalConf','module4') ?? '',
+                'img'=>Redis::hget('globalConf','module4') ?? '/static/carImg/2020/f7ca9919164b.png',
                 'href'=>'/v1/module4',
                 'isNew'=>false,
             ],
             [
                 'name'=>'精致车源',
                 'subtext'=>['炫酷超跑','触手可及'],
-                'img'=>Redis::hget('globalConf','module5') ?? '',
+                'img'=>Redis::hget('globalConf','module5') ?? '/static/carImg/2020/3ecbddf84db1.png',
                 'href'=>'/v1/module5',
                 'isNew'=>false,
             ],
             [
                 'name'=>'超值长租',
                 'subtext'=>['长期租赁','更多优惠'],
-                'img'=>Redis::hget('globalConf','module6') ?? '',
+                'img'=>Redis::hget('globalConf','module6') ?? '/static/carImg/2020/5682a08ddc02.png',
                 'href'=>'/v1/module6',
                 'isNew'=>false,
             ],
@@ -308,13 +308,22 @@ class Index extends BusinessBase
         $page=$request->page ?? 1;
         $pageSize=$request->pageSize ?? 5;
 
+        $offset=($page-1)*$pageSize;
+
         //车辆没有库存限制
         //取出所有出行属性的车
-        $carInfo=carModel::whereIn('carType',[1,2])->get()->toArray();
 
+        $carInfo=carModel::whereIn('carType',[1,2])
+            ->offset($offset)
+            ->limit($pageSize)
+            ->orderBy('level','desc')
+            ->paginate($pageSize,['*'],'',$page)->toArray();
 
-        dd($carInfo);
+        $res=[];
+        $res['list']=$carInfo['data'];
+        $res['total']=$carInfo['total'];
 
+        return $res;
     }
 
     //急速摩托
