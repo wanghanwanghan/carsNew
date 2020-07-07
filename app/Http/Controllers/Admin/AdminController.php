@@ -97,8 +97,8 @@ class AdminController extends AdminBase
             if (!empty($request->carBrand)) $carModelList->where('carBrand',$request->carBrandId);
 
             $tmp=[];
+            $tmp['total']=$carModelList->count();
             $tmp['list']=$carModelList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$carModelList->offset(head($pageInfo))->limit(last($pageInfo))->count();
 
             $res=[
                 'carType'=>$carType,
@@ -553,20 +553,20 @@ class AdminController extends AdminBase
                 $table->string('orderType',50)->comment('自驾/出行/摩托');
                 $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
                 $table->string('account',50)->comment('就是手机号')->index();
+                $table->integer('orderPrice')->unsigned()->comment('订单金额');
+                $table->string('payWay',50)->comment('钱包/微信');
+                $table->string('payment',50)->comment('只交押金/交全款');
                 $table->integer('startTime')->unsigned()->comment('开始时间')->index();
                 $table->integer('stopTime')->unsigned()->comment('结束时间')->index();
                 $table->string('getCarWay',50)->comment('自取/送车');
                 $table->string('getCarPlace')->comment('取车地点');
                 $table->string('rentPersonName',50)->comment('租车人');
                 $table->string('rentPersonPhone',50)->comment('租车电话');
-                $table->integer('orderPrice')->unsigned()->comment('订单金额');
-                $table->string('payWay',50)->comment('钱包/微信');
-                $table->string('payment',50)->comment('只交押金/交全款');
                 $table->string('start')->comment('起点');
                 $table->string('destination')->comment('终点');
-                $table->string('hukangfei1')->nullable()->comment('保留字段');
-                $table->string('hukangfei2')->nullable()->comment('保留字段');
-                $table->string('hukangfei3')->nullable()->comment('保留字段');
+                $table->string('hu')->nullable()->comment('保留字段');
+                $table->string('kang')->nullable()->comment('保留字段');
+                $table->string('fei')->nullable()->comment('保留字段');
                 $table->timestamps();
             });
         }

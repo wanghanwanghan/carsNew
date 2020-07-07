@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Business\Index;
 
 use App\Http\Controllers\Business\BusinessBase;
 use App\Http\Models\banner;
+use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
 use App\Http\Models\carModel;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
 
 class Index extends BusinessBase
@@ -205,48 +207,73 @@ class Index extends BusinessBase
         if (empty($lng) || empty($lat))
         {
             //展示所有车型
+            $all=carModel::where('carType',1);
 
+            if (!empty($cond)) $all->where(function ($q) use ($cond){
+                $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
+            });
 
+            $all=$all->paginate($pageSize,['*'],'',$page)->toArray();
 
+            $res['list']=$all['data'];
+            $res['total']=$all['total'];
 
-
+            return $res;
 
         }else
         {
+            //查询出车行，找一个最近的
+            $carBelong=carBelong::where('cityId',$city)->get()->toArray();
 
+            //随便写个key
+            $key=__FUNCTION__.Str::random(8);
+
+            //添加近去，和用户选择的地方一起添加
+            foreach ($carBelong as $one)
+            {
+                Redis::geoadd($key,$one['lng'],$one['lat'],$one['id']);
+            }
+
+            Redis::geoadd($key,$lng,$lat,'now');
+            Redis::expire($key,60);
+
+            //开始对比距离
+            foreach ($carBelong as $one)
+            {
+                $dist[$one['id']]=Redis::geodist($key,$one['id'],'now');
+            }
+
+            arsort($dist);
+
+            dd($dist);
+
+
+
+
+
+            switch ($request->orderBy)
+            {
+                case 1:
+                    //根据权重排序
+                    break;
+                case 2:
+                    //价格desc
+                    break;
+                case 3:
+                    //价格asc
+                    break;
+                case 4:
+                    //根据订单量
+                    break;
+
+                default:
+            }
+
+
+
+
+            return $res;
         }
-
-
-
-
-
-
-
-
-        switch ($request->orderBy)
-        {
-            case 1:
-                //根据权重排序
-                break;
-            case 2:
-                //价格desc
-                break;
-            case 3:
-                //价格asc
-                break;
-            case 4:
-                //根据订单量
-                break;
-
-            default:
-        }
-
-        //$carInfo=$carInfo->paginate($request->pageSize??10,['*'],'',$request->page??1)->toArray();
-
-        //$res['list']=$carInfo['data'];
-        //$res['total']=$carInfo['total'];
-
-        return $res;
     }
 
     //尊享出行
