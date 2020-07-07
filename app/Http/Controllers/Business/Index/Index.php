@@ -8,6 +8,7 @@ use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
 use App\Http\Models\carModel;
+use App\Http\Models\carModelCarBelong;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class Index extends BusinessBase
     }
 
     //根据timeRange从订单表中取出哪些车被消耗了多少辆
-    private function getCarInfoIdByTimeRange($start,$stop,$orderType=['自驾','出行','摩托'])
+    private function getCarInfoIdByTimeRange($start,$stop,$carBelongId,$orderType=['自驾','出行','摩托'])
     {
         //首先要根据timeRange从表中查出，每种车，有多少被预定了
         $carOrder=order::where(function ($q) use ($start,$stop){
@@ -46,36 +47,49 @@ class Index extends BusinessBase
                 $query->where('startTime','<=',$start)->where('stopTime','>=',$stop);
             });
         })
+            ->whereIn('carBelongId',$carBelongId)
             ->whereIn('orderType',$orderType)
             ->whereIn('orderStatus',['待确认','已确认'])
-            ->groupBy('carInfoId')->select(DB::raw('carInfoId,count(1) as num'))->get()->toArray();
+            ->groupBy('carModelId')->select(DB::raw('carModelId,count(1) as num'))->get()->toArray();
 
         if (in_array('摩托',$orderType))
         {
-            $carInfo=carInfo::get(['id','carNum'])->toArray();
+            //目前没摩托了
+            //$carInfo=carModel::get(['id','carNum'])->toArray();
         }else
         {
-            $carInfo=carInfo::whereIn('carType',[1,2])->get(['id','carNum'])->toArray();
-        }
-
-        //整理数组
-        $carId=[];
-
-        foreach ($carInfo as $one)
-        {
-            $carId[$one['id']]=$one['carNum'];
-        }
-
-        //得到在这段时间内所有，有订单的车，然后判断有没有超过库存
-
-        foreach ($carOrder as $one)
-        {
-            if (!isset($carId[$one['carInfoId']])) continue;
-
-            //租出去的数量，大于等于库存
-            if ($one['num'] >= $carId[$one['carInfoId']])
+            if (empty($carOrder))
             {
-                unset($carId[$one['carInfoId']]);
+                //没有订单，哪种车型都能租
+                $carModelId=carModelCarBelong::whereIn('carBelongId',$carBelongId)->get(['carModelId'])->toArray();
+
+                $carId=Arr::flatten($carModelId);
+
+            }else
+            {
+                //有订单，要查看库存是不是大于租出去的数量
+
+                //先找出当前车行，有哪种车，有多少库存
+                $carModelId=carModelCarBelong::whereIn('carBelongId',$carBelongId)->get()->toArray();
+
+                //整理数组，变成 [ 'carModelId' => 库存 ]
+                $kuCun=[];
+                foreach ($carModelId as $one)
+                {
+                    $kuCun[$one['carModelId']]=$one['carNum'];
+                }
+
+                //得到在这段时间内所有，有订单的车，然后判断有没有超过库存
+                foreach ($carOrder as $one)
+                {
+                    //租出去的数量，大于等于库存
+                    if ($one['num'] >= $kuCun[$one['carModelId']])
+                    {
+                        unset($kuCun[$one['carModelId']]);
+                    }
+                }
+
+                $carId=$kuCun;
             }
         }
 
@@ -202,12 +216,12 @@ class Index extends BusinessBase
         $orderBy=$request->orderBy ?? 1;
         $page=$request->page ?? 1;
         $pageSize=$request->pageSize ?? 10;
-        $orderType=['自驾'];
+        $orderType=['自驾','出行'];
 
         if (empty($lng) || empty($lat))
         {
             //展示所有车型
-            $all=carModel::where('carType',1);
+            $all=carModel::whereIn('carType',[1,2]);
 
             if (!empty($cond)) $all->where(function ($q) use ($cond){
                 $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
@@ -235,6 +249,7 @@ class Index extends BusinessBase
             }
 
             Redis::geoadd($key,$lng,$lat,'now');
+
             Redis::expire($key,60);
 
             //开始对比距离
@@ -243,24 +258,34 @@ class Index extends BusinessBase
                 $dist[$one['id']]=Redis::geodist($key,$one['id'],'now');
             }
 
-            arsort($dist);
+            //值 升序
+            asort($dist,SORT_NUMERIC);
 
-            dd($dist);
+            //取第一个就是最近的车行id
+            $carBelongId=key($dist);
 
+            //然后从订单表中计算这个车行有多少车被订出去了
+            $carModelId=$this->getCarInfoIdByTimeRange($start,$stop,[$carBelongId],$orderType);
 
+            $carModel=carModel::whereIn('carType',[1,2])->whereIn('id',$carModelId);
 
+            if (!empty($cond)) $carModel->where(function ($q) use ($cond){
+                $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
+            });
 
-
-            switch ($request->orderBy)
+            switch ($orderBy)
             {
                 case 1:
                     //根据权重排序
+                    $carModel->orderBy('level','desc');
                     break;
                 case 2:
                     //价格desc
+                    $carModel->orderBy('dayPrice','desc');
                     break;
                 case 3:
                     //价格asc
+                    $carModel->orderBy('dayPrice','asc');
                     break;
                 case 4:
                     //根据订单量
@@ -269,8 +294,10 @@ class Index extends BusinessBase
                 default:
             }
 
+            $all=$carModel->paginate($pageSize,['*'],'',$page)->toArray();
 
-
+            $res['list']=$all['data'];
+            $res['total']=$all['total'];
 
             return $res;
         }
