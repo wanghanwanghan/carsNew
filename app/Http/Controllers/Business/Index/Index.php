@@ -20,6 +20,17 @@ use wanghanwanghan\someUtils\control;
 
 class Index extends BusinessBase
 {
+    //城市列表
+    public function cityList(Request $request)
+    {
+        $china_area=chinaArea::all()->toArray();
+        $tmp=[];
+        control::traverseMenu($china_area,$tmp);
+        $china_area=$tmp;
+
+        return response()->json($this->createReturn(200,$china_area));
+    }
+
     //算offset
     private function offset($request)
     {

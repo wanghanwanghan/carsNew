@@ -22,6 +22,7 @@ Route::group(['middleware'=>['testMiddleware'],'prefix'=>'admin'],function ()
 Route::group(['middleware'=>['testMiddleware'],'prefix'=>'v1'],function ()
 {
     Route::match(['get','post'],'index','Business\Index\Index@Index');//首页
+    Route::match(['get','post'],'cityList','Business\Index\Index@cityList');//城市列表
     Route::match(['get','post'],'module{id}','Business\Index\Index@moduleDispatch')->where('id','[1-6]{1}');//6个模块登录
 
 
