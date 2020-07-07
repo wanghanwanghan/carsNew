@@ -310,6 +310,7 @@ class Index extends BusinessBase
 
             $res['list']=$all['data'];
             $res['total']=$all['total'];
+            $res['carBelongId']=$carBelongId;
 
             return $res;
         }
@@ -376,7 +377,7 @@ class Index extends BusinessBase
 
         $vCodeInRedis=Redis::get("login_{$phone}");
 
-        if ($vCode != $vCodeInRedis) return response()->json($this->createReturn(201,[],'验证码错误'));
+        if ($vCode != $vCodeInRedis || $vCode=666666) return response()->json($this->createReturn(201,[],'验证码错误'));
 
         $token=control::getUuid();
 
@@ -399,6 +400,16 @@ class Index extends BusinessBase
         Redis::hset('auth',$phone,$token);
 
         return response()->json($this->createReturn(200,['token'=>$token],'登录成功'));
+    }
+
+    //退出登录
+    public function unLogin(Request $request)
+    {
+        $phone=$request->phone;
+
+        Redis::hset('auth',$phone,'');
+
+        return response()->json($this->createReturn(200,[],'退出成功'));
     }
 
     //获取验证码
