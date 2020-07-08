@@ -482,7 +482,6 @@ class Index extends BusinessBase
             'out_trade_no'=>control::getUuid(),
             'body'=>'极客超跑1分钱测试',
             'total_fee'=>'1',
-            //'openid'=>$openId,
             'openid'=>last($openId),
         ];
 
