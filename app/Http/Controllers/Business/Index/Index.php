@@ -113,7 +113,7 @@ class Index extends BusinessBase
     }
 
     //返回全局变量
-    private function globalConf()
+    public function globalConf(Request $request)
     {
         $appName=Redis::hget('globalConf','appName') ?? '超酷的名字';
 
@@ -121,11 +121,11 @@ class Index extends BusinessBase
 
         $tel=Redis::hget('globalConf','tel') ?? '4008-517-517';
 
-        return [
+        return response()->json($this->createReturn(200,[
             'appName'=>$appName,
             'tel'=>$tel,
             'logo'=>$logo,
-        ];
+        ]));
     }
 
     //小程序进入首页
@@ -177,7 +177,6 @@ class Index extends BusinessBase
         ];
 
         return response()->json($this->createReturn(200,[
-            'globalConf'=>$this->globalConf(),
             'banner'=>banner::all()->toArray(),
             'module'=>$module,
         ]));
