@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
+use Yansongda\LaravelPay\Facades\Pay;
 
 class Index extends BusinessBase
 {
@@ -469,10 +470,22 @@ class Index extends BusinessBase
     {
         $phone=$request->phone;
 
+        $openId=$request->openId;
+
         //判断登录没登录
         //中间键中判断了
 
         //判断驾照过没过审核
+        $order = [
+            'out_trade_no'=>control::getUuid(),
+            'body'=>'极客超跑1分钱测试',
+            'total_fee'=>'1',
+            'openid'=>$openId,
+        ];
+
+        $result=Pay::wechat()->miniapp($order);
+
+        dd($result);
     }
 
     //保存或更新用户的驾照，或者身份证图片

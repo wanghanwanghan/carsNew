@@ -41,19 +41,19 @@ return [
         'app_id' => env('WECHAT_APP_ID', ''),
 
         // 小程序 APPID
-        'miniapp_id' => env('WECHAT_MINIAPP_ID', 'wx4633f818cd94cd19'),
+        'miniapp_id' => env('WECHAT_MINIAPP_ID', ''),
 
         // APP 引用的 appid
         'appid' => env('WECHAT_APPID', ''),
 
         // 微信支付分配的微信商户号
-        'mch_id' => env('WECHAT_MCH_ID', '1600674992'),
+        'mch_id' => env('WECHAT_MCH_ID', ''),
 
         // 微信支付异步通知地址
         'notify_url' => 'https://jikecardata.bobocar.cn/api/notify/wxNotify',
 
         // 微信支付签名秘钥
-        'key' => env('WECHAT_KEY', '2de036f73379a4c5c889b81c6b6a6e64'),
+        'key' => env('WECHAT_KEY', ''),
 
         // 客户端证书路径，退款、红包等需要用到。请填写绝对路径，linux 请确保权限问题。pem 格式。
         'cert_client' => storage_path('cert/apiclient_cert.pem'),
