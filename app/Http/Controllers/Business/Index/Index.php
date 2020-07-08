@@ -13,7 +13,6 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use App\Http\Models\users;
-use App\Http\Service\GetOpenId;
 use App\Http\Service\SendSms;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
@@ -471,9 +470,6 @@ class Index extends BusinessBase
     {
         $phone=$request->phone;
         $code=$request->code;
-
-        //$openId=GetOpenId::getInstance()->getOpenidAction($code);
-        //dd($openId);
 
 
         //判断登录没登录
