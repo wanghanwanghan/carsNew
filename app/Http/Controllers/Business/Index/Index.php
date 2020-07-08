@@ -12,6 +12,7 @@ use App\Http\Models\carModelCarBelong;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
+use App\Http\Models\users;
 use App\Http\Service\SendSms;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
@@ -467,17 +468,54 @@ class Index extends BusinessBase
     //预定车辆
     public function bookCar(Request $request)
     {
+        $phone=$request->phone;
+
         //判断登录没登录
         //中间键中判断了
 
         //判断驾照过没过审核
-
-
-
-
-
-
     }
+
+    //保存或更新用户的驾照，或者身份证图片
+    public function updateOrCreateUserImg(Request $request)
+    {
+        $phone=$request->phone;
+        $type=$request->type;
+        $img=$request->img;
+
+        $userInfo=users::where('phone',$phone)->first();
+
+        $code=200;
+
+        try
+        {
+            switch ($type)
+            {
+                case 'car':
+                    $userInfo->isCarLicensePass=0;
+                    $userInfo->carLicenseImg=$img;
+                    break;
+                case 'idCard':
+                    $userInfo->isIdCardPass=0;
+                    $userInfo->idCardImg=$img;
+                    break;
+                case 'motor':
+                    $userInfo->isMotorLicensePass=0;
+                    $userInfo->motorLicenseImg=$img;
+                    break;
+                default:
+            }
+
+            $userInfo->save();
+
+        }catch (\Exception $e)
+        {
+            $code=201;
+        }
+
+        return response()->json($this->createReturn($code,[]));
+    }
+
 
 
 

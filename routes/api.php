@@ -26,6 +26,7 @@ Route::group(['prefix'=>'v1'],function ()
     {
         Route::match(['get','post'],'carDetail','Business\Index\Index@carDetail');//车辆详情
         Route::match(['get','post'],'bookCar','Business\Index\Index@bookCar');//预定车辆
+        Route::match(['get','post'],'updateOrCreateUserImg','Business\Index\Index@updateOrCreateUserImg');//更新或保存用户图片
 
 
 
@@ -48,13 +49,6 @@ Route::group(['prefix'=>'v1'],function ()
 Route::group(['prefix'=>'notify'],function ()
 {
     Route::match(['get','post'],'wxNotify','Notify\Notify@wxNotify');//微信通知
-
-
-
-
-
-
-
 
 
 
