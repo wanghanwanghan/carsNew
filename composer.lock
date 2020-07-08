@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26531099c8f37b3b2e45bfa2217825cd",
+    "content-hash": "8edb0156743386e0690499fac2e1328a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4318,16 +4318,16 @@
         },
         {
             "name": "wanghanwanghan/someutils",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wanghanwanghan/someUtils.git",
-                "reference": "00b4fbf9642d5d7c1849b30057fe84474a953b24"
+                "reference": "0d8a01becbc21f069c8035e4263f0b5adb2a663a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/00b4fbf9642d5d7c1849b30057fe84474a953b24",
-                "reference": "00b4fbf9642d5d7c1849b30057fe84474a953b24",
+                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/0d8a01becbc21f069c8035e4263f0b5adb2a663a",
+                "reference": "0d8a01becbc21f069c8035e4263f0b5adb2a663a",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4337,7 +4337,8 @@
                 ]
             },
             "require": {
-                "ext-mbstring": "*"
+                "ext-mbstring": "*",
+                "ext-openssl": "*"
             },
             "type": "library",
             "autoload": {
@@ -4356,7 +4357,7 @@
                 }
             ],
             "description": "2020-06-19 start coding",
-            "time": "2020-06-30T05:40:41+00:00"
+            "time": "2020-07-08T02:30:38+00:00"
         },
         {
             "name": "yansongda/laravel-pay",
@@ -6574,6 +6575,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
+        "ext-json": "*",
         "php": "^7.1.3"
     },
     "platform-dev": [],

@@ -25,7 +25,7 @@ Route::group(['prefix'=>'v1'],function ()
     Route::group(['middleware'=>['testMiddleware']],function ()
     {
         Route::match(['get','post'],'carDetail','Business\Index\Index@carDetail');//车辆详情
-        Route::match(['get','post'],'readyToBook','Business\Index\Index@readyToBook');//准备预定
+        Route::match(['get','post'],'bookCar','Business\Index\Index@bookCar');//预定车辆
 
 
 

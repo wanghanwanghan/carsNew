@@ -9,6 +9,7 @@ use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
 use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
+use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use App\Http\Service\SendSms;
@@ -377,8 +378,6 @@ class Index extends BusinessBase
 
         if ($vCode != $vCodeInRedis && $vCode != 66666666) return response()->json($this->createReturn(201,[],'验证码错误'));
 
-        $token=control::getUuid();
-
         $userInfo=DB::table('users')->where('phone',$phone)->first();
 
         if (empty($userInfo))
@@ -394,6 +393,8 @@ class Index extends BusinessBase
         {
             //登录
         }
+
+        $token=control::aesEncode("{$phone}_{$vCode}",env('AES_SALT',''));
 
         Redis::hset('auth',$phone,$token);
 
@@ -437,26 +438,6 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,[],'发送成功'));
     }
 
-    //获取车辆详情
-    public function carDetail(Request $request)
-    {
-        $carModelId=$request->carModelId;
-
-        $carBelongId=$request->carBelongId;
-
-        $carDetail=carModel::where('id',$carModelId)->first();
-
-        $carBelongDetail=carBelong::where('id',$carBelongId)->first();
-
-
-
-        dd($carDetail,$carBelongDetail);
-
-
-
-
-    }
-
     //根据城市id，返回所有车行信息
     public function allCarBelongInCity(Request $request)
     {
@@ -466,6 +447,43 @@ class Index extends BusinessBase
 
         return response()->json($this->createReturn(200,$carBelongInfo));
     }
+
+    //获取车辆详情
+    public function carDetail(Request $request)
+    {
+        $carModelId=$request->carModelId;
+
+        $carDetail=carModel::where('id',$carModelId)->first()->toArray();
+
+        $carDetail['carType']=carType::find($carDetail['carType'])->toArray();
+
+        $carDetail['carBrandId']=carBrand::find($carDetail['carBrandId'])->toArray();
+
+        $carDetail['label']=[];
+
+        return response()->json($this->createReturn(200,$carDetail));
+    }
+
+    //预定车辆
+    public function bookCar(Request $request)
+    {
+        //判断登录没登录
+        //中间键中判断了
+
+        //判断驾照过没过审核
+
+
+
+
+
+
+    }
+
+
+
+
+
+
 
 
 
