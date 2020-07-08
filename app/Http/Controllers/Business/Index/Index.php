@@ -13,6 +13,7 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\order;
 use App\Http\Models\users;
+use App\Http\Service\GetOpenId;
 use App\Http\Service\SendSms;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
@@ -469,8 +470,9 @@ class Index extends BusinessBase
     public function bookCar(Request $request)
     {
         $phone=$request->phone;
+        $code=$request->code;
 
-        $openId=$request->openId;
+        $openId=GetOpenId::getInstance()->getOpenidAction($code);
 
         //判断登录没登录
         //中间键中判断了
@@ -480,10 +482,13 @@ class Index extends BusinessBase
             'out_trade_no'=>control::getUuid(),
             'body'=>'极客超跑1分钱测试',
             'total_fee'=>'1',
-            'openid'=>$openId,
+            //'openid'=>$openId,
+            'openid'=>last($openId),
         ];
 
         $result=Pay::wechat()->miniapp($order);
+
+
 
         dd($result);
     }
