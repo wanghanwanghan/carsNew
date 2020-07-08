@@ -472,24 +472,14 @@ class Index extends BusinessBase
         $phone=$request->phone;
         $code=$request->code;
 
-        $openId=GetOpenId::getInstance()->getOpenidAction($code);
+        //$openId=GetOpenId::getInstance()->getOpenidAction($code);
+        //dd($openId);
+
 
         //判断登录没登录
         //中间键中判断了
 
         //判断驾照过没过审核
-        $order = [
-            'out_trade_no'=>control::getUuid(),
-            'body'=>'极客超跑1分钱测试',
-            'total_fee'=>'1',
-            'openid'=>last($openId),
-        ];
-
-        $result=Pay::wechat()->miniapp($order);
-
-
-
-        dd($result);
     }
 
     //保存或更新用户的驾照，或者身份证图片

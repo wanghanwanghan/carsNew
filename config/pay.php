@@ -53,7 +53,7 @@ return [
         'notify_url' => 'https://jikecardata.bobocar.cn/api/notify/wxNotify',
 
         // 微信支付签名秘钥
-        'key' => env('WECHAT_KEY', ''),
+        'key' => env('WECHAT_PAY_KEY', ''),
 
         // 客户端证书路径，退款、红包等需要用到。请填写绝对路径，linux 请确保权限问题。pem 格式。
         'cert_client' => storage_path('cert/apiclient_cert.pem'),

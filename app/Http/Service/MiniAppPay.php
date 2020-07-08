@@ -3,8 +3,9 @@
 namespace App\Http\Service;
 
 use wanghanwanghan\someUtils\traits\Singleton;
+use Yansongda\LaravelPay\Facades\Pay;
 
-class GetOpenId
+class MiniAppPay
 {
     use Singleton;
 
@@ -20,7 +21,7 @@ class GetOpenId
     }
 
     //获取用户openid
-    public function getOpenidAction($code)
+    private function getOpenId($code)
     {
         $url='https://api.weixin.qq.com/sns/jscode2session?appid=';
         $url.=$this->appid;
@@ -36,4 +37,18 @@ class GetOpenId
         return json_decode($data,true);
     }
 
+    //创建订单
+    public function createMiniAppOrder($code,$orderId='',$body='1块钱测试',$money=1)
+    {
+        $openId=$this->getOpenId($code);
+
+        $order = [
+            'out_trade_no'=>$orderId,
+            'body'=>$body,
+            'total_fee'=>$money * 100,
+            'openid'=>last($openId),
+        ];
+
+        return Pay::wechat()->miniapp($order);
+    }
 }
