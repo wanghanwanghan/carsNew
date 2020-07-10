@@ -308,6 +308,12 @@ class Index extends BusinessBase
 
             $all=$carModel->paginate($pageSize,['*'],'',$page)->toArray();
 
+            foreach ($all['data'] as &$one)
+            {
+                $one['carBrandId']=carBrand::find($one['carBrandId'])->toArray();
+            }
+            unset($one);
+
             $res['list']=$all['data'];
             $res['total']=$all['total'];
             $res['carBelongId']=$carBelongId;
