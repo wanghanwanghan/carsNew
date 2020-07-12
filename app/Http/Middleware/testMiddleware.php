@@ -8,6 +8,7 @@ use wanghanwanghan\someUtils\control;
 
 class testMiddleware
 {
+    //验证token中间键
     public function handle($request, Closure $next)
     {
         //登录验证

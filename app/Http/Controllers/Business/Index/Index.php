@@ -223,7 +223,7 @@ class Index extends BusinessBase
         $city=$request->city ?? 1;
         $lng=$request->lng ?? '';
         $lat=$request->lat ?? '';
-        $cond=$request->cond ?? '';//搜索条件
+        $cond=$request->cond ?? '';//搜索条件，目前只有品牌
         $start=$request->start ?? '';
         $stop=$request->stop ?? '';
         $orderBy=$request->orderBy ?? 1;
@@ -236,9 +236,17 @@ class Index extends BusinessBase
             //展示所有车型
             $all=carModel::whereIn('carType',[1,2]);
 
-            if (!empty($cond)) $all->where(function ($q) use ($cond){
-                $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
-            });
+            if (!empty($cond))
+            {
+                //先查出品牌
+                $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+
+                $all->where('carBrandId',$carBrand);
+
+                //$all->where(function ($q) use ($cond) {
+                //    $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
+                //});
+            }
 
             $all=$all->paginate($pageSize,['*'],'',$page)->toArray();
 
@@ -282,9 +290,17 @@ class Index extends BusinessBase
 
             $carModel=carModel::whereIn('carType',[1,2])->whereIn('id',$carModelId);
 
-            if (!empty($cond)) $carModel->where(function ($q) use ($cond){
-                $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
-            });
+            if (!empty($cond))
+            {
+                //先查出品牌
+                $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+
+                $carModel->where('carBrandId',$carBrand);
+
+                //if (!empty($cond)) $carModel->where(function ($q) use ($cond){
+                //    $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
+                //});
+            }
 
             switch ($orderBy)
             {
