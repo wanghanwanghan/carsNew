@@ -11,6 +11,7 @@ use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
+use App\Http\Models\coupon;
 use App\Http\Models\order;
 use App\Http\Models\users;
 use App\Http\Service\SendSms;
@@ -511,66 +512,132 @@ class Index extends BusinessBase
     {
         $phone=$request->phone;
         $jsCode=$request->jsCode;
+        $carModelId=$request->carModelId;
+        $rentDays=$request->rentDays;
 
         //判断驾照过没过审核
         $userInfo=users::where('phone',$phone)->first();
 
-        if ($userInfo->isCarLicensePass !== 1)
-        {
+//        if ($userInfo->isCarLicensePass === 0)
+//        {
+//            return response()->json($this->createReturn(201,[],'汽车驾照未上传'));
+//        }
+//
+//        if ($userInfo->isIdCardPass === 0)
+//        {
+//            return response()->json($this->createReturn(201,[],'身份证未上传'));
+//        }
+//
+//        if ($userInfo->isCarLicensePass === 1)
+//        {
+//            return response()->json($this->createReturn(201,[],'汽车驾照正在审核中'));
+//        }
+//
+//        if ($userInfo->isIdCardPass === 1)
+//        {
+//            return response()->json($this->createReturn(201,[],'身份证正在审核中'));
+//        }
+//
+//        if ($userInfo->isCarLicensePass === 2)
+//        {
+//            return response()->json($this->createReturn(201,[],'汽车驾照未通过审核'));
+//        }
+//
+//        if ($userInfo->isIdCardPass === 2)
+//        {
+//            return response()->json($this->createReturn(201,[],'身份证未通过审核'));
+//        }
 
+        //找出这辆车需要花费多少钱
+        $carInfo=carModel::find($carModelId)->first();
+
+        //车损押金
+        $damagePrice=$carInfo->damagePrice;
+
+        //违章押金
+        $forfeitPrice=$carInfo->forfeitPrice;
+
+        //日租价格
+        $dayPrice=$carInfo->dayPrice;
+
+        //日租折扣
+        $dayDiscount=$carInfo->dayDiscount;
+
+        if ($dayDiscount==0)
+        {
+            $payMoney=$dayPrice * $rentDays;
+        }else
+        {
+            $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount));
+            $payMoney=$payMoney * $rentDays;
         }
 
-        if ($userInfo->isIdCardPass !== 1)
-        {
+        $pay=[
+            'damagePrice'=>$damagePrice,
+            'forfeitPrice'=>$forfeitPrice,
+            'dayPrice'=>$dayPrice,
+            'dayDiscount'=>$dayDiscount,
+            'payMoney'=>$payMoney,
+        ];
 
+        //找出哪些优惠券可用
+        $couponInfo=coupon::where('phone',$phone)->where('couponType','自驾')->get()->toArray();
+
+        $available=$disabled=[];
+
+        foreach ($couponInfo as $key => $val)
+        {
+            //过滤出过期的
+            if ($val['expireStart'] <= time() && $val['expireStop'] >= time())
+            {
+                //在有效期之内的
+
+
+            }else
+            {
+                $disabled[]=$couponInfo[$key];
+                unset($couponInfo[$key]);
+            }
         }
 
 
 
 
 
-
-
+        return response()->json($this->createReturn(200,['coupon'=>['available'=>$available,'disabled'=>$disabled],'pay'=>$pay]));
     }
 
     //保存或更新用户的驾照，或者身份证图片
     public function updateOrCreateUserImg(Request $request)
     {
         $phone=$request->phone;
-        $type=$request->type;
-        $img=$request->img;
+        $car=$request->car;
+        $motor=$request->motor;
+        $idCard=$request->idCard;
 
         $userInfo=users::where('phone',$phone)->first();
 
-        $code=200;
-
-        try
+        if (!empty($car))
         {
-            switch ($type)
-            {
-                case 'car':
-                    $userInfo->isCarLicensePass=0;
-                    $userInfo->carLicenseImg=$img;
-                    break;
-                case 'idCard':
-                    $userInfo->isIdCardPass=0;
-                    $userInfo->idCardImg=$img;
-                    break;
-                case 'motor':
-                    $userInfo->isMotorLicensePass=0;
-                    $userInfo->motorLicenseImg=$img;
-                    break;
-                default:
-            }
-
-            $userInfo->save();
-
-        }catch (\Exception $e)
-        {
-            $code=201;
+            $userInfo->isCarLicensePass=0;
+            $userInfo->carLicenseImg=$car;
         }
 
-        return response()->json($this->createReturn($code,[]));
+        if (!empty($motor))
+        {
+            $userInfo->isMotorLicensePass=0;
+            $userInfo->motorLicenseImg=$motor;
+        }
+
+        if (!empty($idCard))
+        {
+            $userInfo->isIdCardPass=0;
+            $userInfo->idCardImg=$idCard;
+        }
+
+        $userInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
     }
 
 
