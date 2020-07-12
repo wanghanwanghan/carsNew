@@ -511,42 +511,41 @@ class Index extends BusinessBase
     public function bookCar(Request $request)
     {
         $phone=$request->phone;
-        $jsCode=$request->jsCode;
         $carModelId=$request->carModelId;
         $rentDays=$request->rentDays;
 
         //判断驾照过没过审核
         $userInfo=users::where('phone',$phone)->first();
 
-//        if ($userInfo->isCarLicensePass === 0)
-//        {
-//            return response()->json($this->createReturn(201,[],'汽车驾照未上传'));
-//        }
-//
-//        if ($userInfo->isIdCardPass === 0)
-//        {
-//            return response()->json($this->createReturn(201,[],'身份证未上传'));
-//        }
-//
-//        if ($userInfo->isCarLicensePass === 1)
-//        {
-//            return response()->json($this->createReturn(201,[],'汽车驾照正在审核中'));
-//        }
-//
-//        if ($userInfo->isIdCardPass === 1)
-//        {
-//            return response()->json($this->createReturn(201,[],'身份证正在审核中'));
-//        }
-//
-//        if ($userInfo->isCarLicensePass === 2)
-//        {
-//            return response()->json($this->createReturn(201,[],'汽车驾照未通过审核'));
-//        }
-//
-//        if ($userInfo->isIdCardPass === 2)
-//        {
-//            return response()->json($this->createReturn(201,[],'身份证未通过审核'));
-//        }
+        if ($userInfo->isCarLicensePass === 0)
+        {
+            return response()->json($this->createReturn(201,[],'汽车驾照未上传'));
+        }
+
+        if ($userInfo->isIdCardPass === 0)
+        {
+            return response()->json($this->createReturn(201,[],'身份证未上传'));
+        }
+
+        if ($userInfo->isCarLicensePass === 1)
+        {
+            return response()->json($this->createReturn(201,[],'汽车驾照正在审核中'));
+        }
+
+        if ($userInfo->isIdCardPass === 1)
+        {
+            return response()->json($this->createReturn(201,[],'身份证正在审核中'));
+        }
+
+        if ($userInfo->isCarLicensePass === 2)
+        {
+            return response()->json($this->createReturn(201,[],'汽车驾照未通过审核'));
+        }
+
+        if ($userInfo->isIdCardPass === 2)
+        {
+            return response()->json($this->createReturn(201,[],'身份证未通过审核'));
+        }
 
         //找出这辆车需要花费多少钱
         $carInfo=carModel::find($carModelId)->first();
@@ -585,24 +584,20 @@ class Index extends BusinessBase
 
         $available=$disabled=[];
 
-        foreach ($couponInfo as $key => $val)
+        foreach ($couponInfo as $val)
         {
-            //过滤出过期的
-            if ($val['expireStart'] <= time() && $val['expireStop'] >= time())
-            {
-                //在有效期之内的
+            //过期了，或者还没开始
+            if ($val['expireStart'] >= time() || $val['expireStop'] <= time()) $disabled[]=$val;
 
+            //金额减免，未到触发金额
+            if ($val['discountWay']==='金额减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
 
-            }else
-            {
-                $disabled[]=$couponInfo[$key];
-                unset($couponInfo[$key]);
-            }
+            //折扣减免，未到触发金额
+            if ($val['discountWay']==='折扣减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+
+            //可用的优惠券
+            $available[]=$val;
         }
-
-
-
-
 
         return response()->json($this->createReturn(200,['coupon'=>['available'=>$available,'disabled'=>$disabled],'pay'=>$pay]));
     }
