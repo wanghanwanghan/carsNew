@@ -507,45 +507,35 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,$carDetail));
     }
 
+    public function getLicenseStatus(Request $request)
+    {
+        $phone=$request->phone;
+
+        //判断驾照过没过审核
+        $userInfo=users::where('phone',$phone)->first();
+
+        $status=[
+            99=>'通过',
+            0=>'未提交',
+            1=>'审核中',
+            2=>'未通过',
+        ];
+
+        $licenseStatus=[
+            'car'=>$userInfo->isCarLicensePass,
+            'motor'=>$userInfo->isMotorLicensePass,
+            'IdCard'=>$userInfo->isIdCardPass,
+        ];
+
+        return response()->json($this->createReturn(200,['statusList'=>$status,'licenseStatus'=>$licenseStatus]));
+    }
+
     //预定车辆
     public function bookCar(Request $request)
     {
         $phone=$request->phone;
         $carModelId=$request->carModelId;
         $rentDays=$request->rentDays;
-
-        //判断驾照过没过审核
-        $userInfo=users::where('phone',$phone)->first();
-
-        if ($userInfo->isCarLicensePass === 0)
-        {
-            return response()->json($this->createReturn(201,[],'汽车驾照未上传'));
-        }
-
-        if ($userInfo->isIdCardPass === 0)
-        {
-            return response()->json($this->createReturn(201,[],'身份证未上传'));
-        }
-
-        if ($userInfo->isCarLicensePass === 1)
-        {
-            return response()->json($this->createReturn(201,[],'汽车驾照正在审核中'));
-        }
-
-        if ($userInfo->isIdCardPass === 1)
-        {
-            return response()->json($this->createReturn(201,[],'身份证正在审核中'));
-        }
-
-        if ($userInfo->isCarLicensePass === 2)
-        {
-            return response()->json($this->createReturn(201,[],'汽车驾照未通过审核'));
-        }
-
-        if ($userInfo->isIdCardPass === 2)
-        {
-            return response()->json($this->createReturn(201,[],'身份证未通过审核'));
-        }
 
         //找出这辆车需要花费多少钱
         $carInfo=carModel::find($carModelId)->first();
