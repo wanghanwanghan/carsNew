@@ -239,7 +239,13 @@ class Index extends BusinessBase
             if (!empty($cond))
             {
                 //先查出品牌
-                $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                try
+                {
+                    $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                }catch (\Exception $e)
+                {
+                    $carBrand=control::getUuid();
+                }
 
                 $all->where('carBrandId',$carBrand);
 
@@ -293,7 +299,13 @@ class Index extends BusinessBase
             if (!empty($cond))
             {
                 //先查出品牌
-                $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                try
+                {
+                    $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                }catch (\Exception $e)
+                {
+                    $carBrand=control::getUuid();
+                }
 
                 $carModel->where('carBrandId',$carBrand);
 
