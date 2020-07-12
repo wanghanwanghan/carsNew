@@ -548,12 +548,16 @@ class AdminController extends AdminBase
             {
                 $table->increments('id')->unsigned()->comment('主键');
                 $table->string('orderId',50)->comment('订单号')->index();
+                $table->integer('coupon1')->unsigned()->comment('优惠券1');
+                $table->integer('coupon2')->unsigned()->comment('优惠券2');
+                $table->integer('coupon3')->unsigned()->comment('优惠券3');
                 $table->integer('carModelId')->unsigned()->comment('车辆类型表id')->index();
                 $table->integer('carBelongId')->unsigned()->comment('车行表id')->index();
                 $table->string('orderType',50)->comment('自驾/出行/摩托');
                 $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
                 $table->string('account',50)->comment('就是手机号')->index();
                 $table->integer('orderPrice')->unsigned()->comment('订单金额');
+                $table->integer('depositPrice')->unsigned()->comment('押金金额');
                 $table->string('payWay',50)->comment('钱包/微信');
                 $table->string('payment',50)->comment('只交押金/交全款');
                 $table->integer('startTime')->unsigned()->comment('开始时间')->index();
@@ -564,9 +568,6 @@ class AdminController extends AdminBase
                 $table->string('rentPersonPhone',50)->comment('租车电话');
                 $table->string('start')->comment('起点');
                 $table->string('destination')->comment('终点');
-                $table->string('hu')->nullable()->comment('保留字段');
-                $table->string('kang')->nullable()->comment('保留字段');
-                $table->string('fei')->nullable()->comment('保留字段');
                 $table->timestamps();
             });
         }

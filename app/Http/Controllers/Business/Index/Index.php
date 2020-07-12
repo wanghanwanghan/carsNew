@@ -585,6 +585,9 @@ class Index extends BusinessBase
             //折扣减免，未到触发金额
             if ($val['discountWay']==='折扣减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
 
+            //押金减免，未到触发金额
+            if ($val['discountWay']==='押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+
             //可用的优惠券
             $available[]=$val;
         }
@@ -625,6 +628,17 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //创建并支付订单，或者根据订单号，直接支付
+    public function payOrder(Request $request)
+    {
+        $phone=$request->phone;
+
+
+
+
+
+
+    }
 
 
 
