@@ -483,7 +483,7 @@ class Index extends BusinessBase
     //根据城市id，返回所有车行信息
     public function allCarBelongInCity(Request $request)
     {
-        $cityId=$request->cityId;
+        $cityId=$request->cityId ?? 1;
 
         $carBelongInfo=carBelong::where('cityId',$cityId)->get()->toArray();
 
@@ -493,7 +493,7 @@ class Index extends BusinessBase
     //获取车辆详情
     public function carDetail(Request $request)
     {
-        $carModelId=$request->carModelId;
+        $carModelId=$request->carModelId ?? 1;
 
         $carDetail=carModel::where('id',$carModelId)->first()->toArray();
 
@@ -510,13 +510,27 @@ class Index extends BusinessBase
     public function bookCar(Request $request)
     {
         $phone=$request->phone;
-        $code=$request->code;
-
-
-        //判断登录没登录
-        //中间键中判断了
+        $jsCode=$request->jsCode;
 
         //判断驾照过没过审核
+        $userInfo=users::where('phone',$phone)->first();
+
+        if ($userInfo->isCarLicensePass !== 1)
+        {
+
+        }
+
+        if ($userInfo->isIdCardPass !== 1)
+        {
+
+        }
+
+
+
+
+
+
+
     }
 
     //保存或更新用户的驾照，或者身份证图片
