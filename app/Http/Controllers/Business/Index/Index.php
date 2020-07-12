@@ -241,13 +241,13 @@ class Index extends BusinessBase
                 //先查出品牌
                 try
                 {
-                    $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                    $carBrand=carBrand::where('carBrand','like',"%{$cond}%")->pluck('id')->toArray();
                 }catch (\Exception $e)
                 {
-                    $carBrand=control::getUuid();
+                    $carBrand=[control::getUuid()];
                 }
 
-                $all->where('carBrandId',$carBrand);
+                $all->whereIn('carBrandId',$carBrand);
 
                 //$all->where(function ($q) use ($cond) {
                 //    $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
@@ -301,13 +301,13 @@ class Index extends BusinessBase
                 //先查出品牌
                 try
                 {
-                    $carBrand=carBrand::where('carBrand',$cond)->first()->id;
+                    $carBrand=carBrand::where('carBrand','like',"%{$cond}%")->pluck('id')->toArray();
                 }catch (\Exception $e)
                 {
-                    $carBrand=control::getUuid();
+                    $carBrand=[control::getUuid()];
                 }
 
-                $carModel->where('carBrandId',$carBrand);
+                $carModel->whereIn('carBrandId',$carBrand);
 
                 //if (!empty($cond)) $carModel->where(function ($q) use ($cond){
                 //    $q->where('carModel','like',"%{$cond}%")->orWhere('carDesc','like',"%{$cond}%");
