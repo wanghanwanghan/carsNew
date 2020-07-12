@@ -278,13 +278,13 @@ class Index extends BusinessBase
 
             Redis::geoadd($key,$lng,$lat,'now');
 
-            Redis::expire($key,60);
-
             //开始对比距离
             foreach ($carBelong as $one)
             {
                 $dist[$one['id']]=Redis::geodist($key,$one['id'],'now');
             }
+
+            Redis::expire($key,60);
 
             //值 升序
             asort($dist,SORT_NUMERIC);
@@ -624,6 +624,7 @@ class Index extends BusinessBase
 
         return response()->json($this->createReturn(200,[]));
     }
+
 
 
 
