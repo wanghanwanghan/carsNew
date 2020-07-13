@@ -604,6 +604,7 @@ class Index extends BusinessBase
         $motor=$request->motor;
         $idCard=$request->idCard;
         $passport=$request->passport;
+        $oftenCity=$request->oftenCity;
 
         $userInfo=users::where('phone',$phone)->first();
 
@@ -629,6 +630,11 @@ class Index extends BusinessBase
         {
             $userInfo->isPassportPass=1;
             $userInfo->passportImg=$passport;
+        }
+
+        if (!empty($oftenCity))
+        {
+            $userInfo->oftenCity=$oftenCity;
         }
 
         $userInfo->save();
