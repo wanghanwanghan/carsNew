@@ -126,9 +126,8 @@
 方法:get/post
 请求头:Authorization = XXX
 参数:
-     ==========创建新订单时==========
      phone = 13800138000，用户手机号
-     startTime = 1593843664，时间范围，开始时间
+     startTime = 1593743664，时间范围，开始时间
      stopTime = 1593843664，时间范围，结束时间
      orderType = 1，1是自驾，2是出行，3是摩托
      carModelId = 1，车辆型号id

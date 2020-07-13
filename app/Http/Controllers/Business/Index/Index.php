@@ -558,7 +558,7 @@ class Index extends BusinessBase
             $payMoney=$dayPrice * $rentDays;
         }else
         {
-            $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount));
+            $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount * 0.01));
             $payMoney=$payMoney * $rentDays;
         }
 
@@ -669,13 +669,13 @@ class Index extends BusinessBase
         {
             case '1':
                 //日租
-                $payMoney=$carInfo->dayPrice - ($carInfo->dayPrice * $carInfo->dayDiscount);
+                $payMoney=$carInfo->dayPrice - ($carInfo->dayPrice * $carInfo->dayDiscount * 0.01);
                 $payMoney=$payMoney * $rentDays;
                 $orderType='自驾';
                 break;
             case '2':
                 //出行
-                $payMoney=$carInfo->goPrice - ($carInfo->goPrice * $carInfo->goDiscount);
+                $payMoney=$carInfo->goPrice - ($carInfo->goPrice * $carInfo->goDiscount * 0.01);
                 $orderType='出行';
                 break;
             case '3':
@@ -718,7 +718,7 @@ class Index extends BusinessBase
         $insert=[
             'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
             'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待确认',
-            'account'=>$phone, 'orderPrice'=>$payMoney, 'depositPrice'=>$damagePrice+$forfeitPrice,
+            'account'=>$phone, 'orderPrice'=>sprintf('%.2f',$payMoney), 'depositPrice'=>$damagePrice+$forfeitPrice,
             'payWay'=>'待选择', 'payment'=>'待选择', 'startTime'=>$startTime, 'stopTime'=>$stopTime,
             'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
             'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
