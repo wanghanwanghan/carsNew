@@ -661,7 +661,7 @@ class Index extends BusinessBase
 
         $userInfo=users::where('phone',$phone)->first();
 
-        $cityName=chinaArea::whereIn('id',$userInfo->oftenCity)->first()->name;
+        $cityName=chinaArea::where('id',$userInfo->oftenCity)->first()->name;
 
         $china_area=chinaArea::all()->toArray();
         $tmp=[];
