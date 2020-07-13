@@ -657,8 +657,8 @@ class Index extends BusinessBase
         $rentDays=(int)$request->rentDays;
         $getCarWay=$request->getCarWay;
         $getCarPlace=$request->getCarPlace;
-        $start=$request->start;//出行用的起点
-        $destination=$request->destination;//出行用的终点
+        $start=$request->start ?? '';//出行用的起点
+        $destination=$request->destination ?? '';//出行用的终点
 
         $orderId=control::getUuid();
 
