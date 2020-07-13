@@ -571,7 +571,7 @@ class Index extends BusinessBase
         ];
 
         //找出哪些优惠券可用
-        $couponInfo=coupon::where('phone',$phone)->where('couponType','自驾')->get()->toArray();
+        $couponInfo=coupon::where('phone',$phone)->where('couponType','自驾')->where('isUse',0)->get()->toArray();
 
         $available=$disabled=[];
 
@@ -642,16 +642,101 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,[]));
     }
 
-    //创建并支付订单，或者根据订单号，直接支付
-    public function payOrder(Request $request)
+    //创建订单
+    public function createOrder(Request $request)
     {
         $phone=$request->phone;
+        $startTime=$request->startTime;
+        $stopTime =$request->stopTime;
+        $carModelId=$request->carModelId;
+        $carBelongId=$request->carBelongId;
+        $rentPersonName=$request->rentPersonName;
+        $rentPersonPhone=$request->rentPersonPhone;
+        $couponId=(int)$request->couponId;
+        $orderType=$request->orderType;
+        $rentDays=(int)$request->rentDays;
+        $getCarWay=$request->getCarWay;
+        $getCarPlace=$request->getCarPlace;
+        $start=$request->start;//出行用的起点
+        $destination=$request->destination;//出行用的终点
+
+        $orderId=control::getUuid();
+
+        //日租还是出行，还是摩托的价格
+        $carInfo=carModel::find($carModelId)->first();
+
+        switch ($orderType)
+        {
+            case '1':
+                //日租
+                $payMoney=$carInfo->dayPrice - ($carInfo->dayPrice * $carInfo->dayDiscount);
+                $payMoney=$payMoney * $rentDays;
+                $orderType='自驾';
+                break;
+            case '2':
+                //出行
+                $payMoney=$carInfo->goPrice - ($carInfo->goPrice * $carInfo->goDiscount);
+                $orderType='出行';
+                break;
+            case '3':
+                //摩托
+                $orderType='摩托';
+                break;
+            default:
+        }
+
+        //车损
+        $damagePrice=$carInfo->damagePrice;
+        //违章
+        $forfeitPrice=$carInfo->forfeitPrice;
+
+        //如果有优惠券
+        if (!empty($couponId))
+        {
+            $couponInfo=coupon::find($couponId)->first();
 
 
 
 
 
 
+
+
+        }
+
+        if ($getCarWay==1)
+        {
+            $getCarWay='自取';
+
+            $getCarPlace=carBelong::find($carBelongId)->first()->address;
+
+        }else
+        {
+            $getCarWay='送车';
+        }
+
+        $insert=[
+            'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
+            'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待确认',
+            'account'=>$phone, 'orderPrice'=>$payMoney, 'depositPrice'=>$damagePrice+$forfeitPrice,
+            'payWay'=>'待选择', 'payment'=>'待选择', 'startTime'=>$startTime, 'stopTime'=>$stopTime,
+            'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
+            'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
+        ];
+
+        try
+        {
+            $code=200;
+            $res=order::create($insert);
+            $orderId=$res->orderId;
+
+        }catch (\Exception $e)
+        {
+            $code=201;
+            $orderId='';
+        }
+
+        return response()->json($this->createReturn($code,['orderId'=>$orderId]));
     }
 
     //获取用户常用车城市

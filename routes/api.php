@@ -27,7 +27,7 @@ Route::group(['prefix'=>'v1'],function ()
         Route::match(['get','post'],'bookCar','Business\Index\Index@bookCar');//预定车辆
         Route::match(['get','post'],'updateOrCreateUserImg','Business\Index\Index@updateOrCreateUserImg');//更新或保存用户图片
         Route::match(['get','post'],'getLicenseStatus','Business\Index\Index@getLicenseStatus');//获取用户驾照和身份证审核状态
-        Route::match(['get','post'],'payOrder','Business\Index\Index@payOrder');//支付订单
+        Route::match(['get','post'],'createOrder','Business\Index\Index@createOrder');//创建订单
         Route::match(['get','post'],'getOftenCity','Business\Index\Index@getOftenCity');//获取用户常用车城市
         Route::match(['get','post'],'getUserInfo','Business\Index\Index@getUserInfo');//获取用户信息
 
