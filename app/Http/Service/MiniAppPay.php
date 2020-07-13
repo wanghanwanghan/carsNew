@@ -38,7 +38,7 @@ class MiniAppPay
     }
 
     //创建订单
-    public function createMiniAppOrder($code,$orderId='',$body='1块钱测试',$money=1)
+    public function createMiniAppOrder($code,$orderId='',$body='1分钱测试',$money=0.01)
     {
         $openId=$this->getOpenId($code);
 

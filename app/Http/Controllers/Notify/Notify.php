@@ -10,7 +10,7 @@ class Notify extends Controller
 {
     public function wxNotify(Request $request)
     {
-        Redis::set(json_encode($request->all()));
+        Redis::set('minipay',json_encode($request->all()));
     }
 
 }

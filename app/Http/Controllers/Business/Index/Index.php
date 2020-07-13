@@ -14,6 +14,7 @@ use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
 use App\Http\Models\users;
+use App\Http\Service\MiniAppPay;
 use App\Http\Service\SendSms;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
@@ -786,6 +787,17 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,$userInfo));
     }
 
+    //支付订单
+    public function payOrder(Request $request)
+    {
+        $orderId=$request->orderId;
+        $jsCode=$request->jsCode;
+        $phone=$request->phone;
+
+        $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId);
+
+        return response()->json($this->createReturn(200,$miniApp));
+    }
 
 
 
