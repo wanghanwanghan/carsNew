@@ -5035,16 +5035,16 @@
         },
         {
             "name": "wanghanwanghan/someutils",
-            "version": "1.0.5",
+            "version": "1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wanghanwanghan/someUtils.git",
-                "reference": "0d8a01becbc21f069c8035e4263f0b5adb2a663a"
+                "reference": "20d1290b1bddd319eee9cd6286763c035164d7ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/0d8a01becbc21f069c8035e4263f0b5adb2a663a",
-                "reference": "0d8a01becbc21f069c8035e4263f0b5adb2a663a",
+                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/20d1290b1bddd319eee9cd6286763c035164d7ce",
+                "reference": "20d1290b1bddd319eee9cd6286763c035164d7ce",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5054,6 +5054,7 @@
                 ]
             },
             "require": {
+                "ext-json": "*",
                 "ext-mbstring": "*",
                 "ext-openssl": "*"
             },
@@ -5074,7 +5075,7 @@
                 }
             ],
             "description": "2020-06-19 start coding",
-            "time": "2020-07-08T02:30:38+00:00"
+            "time": "2020-07-13T09:22:29+00:00"
         },
         {
             "name": "yansongda/laravel-pay",

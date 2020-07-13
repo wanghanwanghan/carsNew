@@ -674,6 +674,33 @@ class Index extends BusinessBase
         ]));
     }
 
+    //获取用户信息
+    public function getUserInfo(Request $request)
+    {
+        $phone=$request->phone;
+
+        $userInfo=users::where('phone',$phone)->first()->toArray();
+
+        //用车城市
+        $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity'])->first()->toArray();
+
+        //驾照的几个状态
+        $status=[
+            99=>'通过',
+            0=>'未提交',
+            1=>'审核中',
+            2=>'未通过',
+        ];
+
+        //驾照
+        $userInfo['isCarLicensePass']=['status'=>$userInfo['isCarLicensePass'],'name'=>$status[$userInfo['isCarLicensePass']]];
+        $userInfo['isMotorLicensePass']=['status'=>$userInfo['isMotorLicensePass'],'name'=>$status[$userInfo['isMotorLicensePass']]];
+        $userInfo['isPassportPass']=['status'=>$userInfo['isPassportPass'],'name'=>$status[$userInfo['isPassportPass']]];
+        $userInfo['isIdCardPass']=['status'=>$userInfo['isIdCardPass'],'name'=>$status[$userInfo['isIdCardPass']]];
+
+        return response()->json($this->createReturn(200,$userInfo));
+    }
+
 
 
 
