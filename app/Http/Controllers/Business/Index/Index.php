@@ -524,6 +524,7 @@ class Index extends BusinessBase
         $licenseStatus=[
             'car'=>$userInfo->isCarLicensePass,
             'motor'=>$userInfo->isMotorLicensePass,
+            'passport'=>$userInfo->isPassportPass,
             'IdCard'=>$userInfo->isIdCardPass,
         ];
 
@@ -602,25 +603,32 @@ class Index extends BusinessBase
         $car=$request->car;
         $motor=$request->motor;
         $idCard=$request->idCard;
+        $passport=$request->passport;
 
         $userInfo=users::where('phone',$phone)->first();
 
         if (!empty($car))
         {
-            $userInfo->isCarLicensePass=0;
+            $userInfo->isCarLicensePass=1;
             $userInfo->carLicenseImg=$car;
         }
 
         if (!empty($motor))
         {
-            $userInfo->isMotorLicensePass=0;
+            $userInfo->isMotorLicensePass=1;
             $userInfo->motorLicenseImg=$motor;
         }
 
         if (!empty($idCard))
         {
-            $userInfo->isIdCardPass=0;
+            $userInfo->isIdCardPass=1;
             $userInfo->idCardImg=$idCard;
+        }
+
+        if (!empty($passport))
+        {
+            $userInfo->isPassportPass=1;
+            $userInfo->passportImg=$passport;
         }
 
         $userInfo->save();
@@ -638,6 +646,26 @@ class Index extends BusinessBase
 
 
 
+    }
+
+    //获取用户常用车城市
+    public function getOftenCity(Request $request)
+    {
+        $phone=$request->phone;
+
+        $userInfo=users::where('phone',$phone)->first();
+
+        $cityName=chinaArea::whereIn('id',$userInfo->oftenCity)->first()->name;
+
+        $china_area=chinaArea::all()->toArray();
+        $tmp=[];
+        control::traverseMenu($china_area,$tmp);
+        $china_area=$tmp;
+
+        return response()->json($this->createReturn(200,[
+            'oftenCity'=>$cityName,
+            'china_area'=>$china_area
+        ]));
     }
 
 
