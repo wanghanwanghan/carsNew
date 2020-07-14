@@ -660,6 +660,9 @@ class Index extends BusinessBase
         $getCarPlace=$request->getCarPlace ?? '';
         $start=$request->start ?? '';//出行用的起点
         $destination=$request->destination ?? '';//出行用的终点
+        $payment=(int)$request->payment;//1是全款，2是只违章押金
+
+        $payment===1 ? $payment='全款' : $payment='违章押金';
 
         $orderId=control::getUuid();
 
@@ -720,7 +723,7 @@ class Index extends BusinessBase
             'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
             'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待支付', 'account'=>$phone,
             'orderPrice'=>sprintf('%.2f',$payMoney), 'damagePrice'=>$damagePrice, 'forfeitPrice'=>$forfeitPrice,
-            'payWay'=>'待选择', 'payment'=>'待选择', 'startTime'=>$startTime, 'stopTime'=>$stopTime,
+            'payWay'=>'待选择', 'payment'=>$payment, 'startTime'=>$startTime, 'stopTime'=>$stopTime,
             'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
             'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
             'NotifyInfo'=>''
@@ -795,20 +798,21 @@ class Index extends BusinessBase
         $jsCode=$request->jsCode;
         $phone=$request->phone;
         $payWay=(int)$request->payWay;//1是用户钱包支付
-        $payment=(int)$request->payment;//1是全款
 
         //用orderId取出该订单需要支付的所有金额再转换成XXX分钱
 
         $orderInfo=order::where('orderId',$orderId)->first();
 
-        if ($payment===1)
+        $payment=$orderInfo->payment;
+
+        if ($payment==='全款')
         {
             $payMoney=$orderInfo->orderPrice + $orderInfo->damagePrice + $orderInfo->forfeitPrice;
-            $payment='全款';
-        }else
+        }
+
+        if ($payment==='违章押金')
         {
             $payMoney=$orderInfo->forfeitPrice;
-            $payment='违章押金';
         }
 
         if ($payWay===1)
@@ -830,7 +834,6 @@ class Index extends BusinessBase
                 $userInfo->money=$userInfo->money - $payMoney;
 
                 $orderInfo->payWay=$payWay;
-                $orderInfo->payment=$payment;
                 $orderInfo->orderStatus='待确认';
 
                 $userInfo->save();
@@ -848,7 +851,7 @@ class Index extends BusinessBase
 
         //把用户选择的状态先存一下，等支付回调的时候再修改上
 
-        $orderInfo->NotifyInfo="{$payWay}_{$payment}";
+        $orderInfo->NotifyInfo="{$payWay}_payWay";
 
         $body="极客超跑-租车服务";
 

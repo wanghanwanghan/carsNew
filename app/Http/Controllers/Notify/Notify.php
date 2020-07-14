@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Notify;
 
 use App\Http\Controllers\Controller;
 use App\Http\Models\order;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -46,7 +45,6 @@ class Notify extends Controller
             $status=explode('_',$orderInfo->NotifyInfo);
 
             $orderInfo->payWay=head($status);
-            $orderInfo->payment=last($status);
             $orderInfo->orderStatus='待确认';
             $orderInfo->NotifyInfo=json_encode($data);
 
