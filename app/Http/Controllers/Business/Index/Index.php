@@ -799,6 +799,7 @@ class Index extends BusinessBase
         $orderId=$request->orderId;
         $jsCode=$request->jsCode;
         $phone=$request->phone;
+        $password=$request->password;
         $payWay=(int)$request->payWay;//1是用户钱包支付
 
         //用orderId取出该订单需要支付的所有金额再转换成XXX分钱
@@ -821,8 +822,15 @@ class Index extends BusinessBase
         {
             $payWay='钱包';
 
-            //查询用户余额够不够
+            //查询用户余额够不够，支付密码对不对
             $userInfo=users::where('phone',$phone)->first();
+
+            $password=control::aesEncode($password,$phone);
+
+            if ($password !== $userInfo->password)
+            {
+                return response()->json($this->createReturn(201,[],'支付密码错误'));
+            }
 
             if ($userInfo->money < $payMoney)
             {
