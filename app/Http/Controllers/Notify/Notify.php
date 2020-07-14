@@ -12,12 +12,12 @@ class Notify extends Controller
 {
     public function wxNotify(Request $request)
     {
-        $pay=Pay::wechat();
-
         $key='MiniPay_'.Carbon::now()->format('YmdHis');
 
         try
         {
+            $pay=Pay::wechat();
+
             $data=$pay->verify();
 
             Redis::set($key,json_encode($data));
