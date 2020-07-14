@@ -51,4 +51,22 @@ class MiniAppPay
 
         return Pay::wechat()->miniapp($order);
     }
+
+    //退款
+    public function refundOrder($orderId)
+    {
+        $order = [
+            'out_trade_no' => $orderId,
+            'out_refund_no' => time(),
+            'total_fee' => '1',
+            'refund_fee' => '1',
+            'refund_desc' => '全额退款',
+            'type' => 'miniapp'
+        ];
+
+        $result = Pay::wechat()->refund($order);
+
+
+        dd($result);
+    }
 }

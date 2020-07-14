@@ -853,6 +853,8 @@ class Index extends BusinessBase
 
         $orderInfo->NotifyInfo="{$payWay}_payWay";
 
+        $orderInfo->save();
+
         $body="极客超跑-租车服务";
 
         //上线后删了这行
