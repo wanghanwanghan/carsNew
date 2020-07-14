@@ -871,7 +871,53 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,$miniApp));
     }
 
+    //支付密码
+    public function payPassword(Request $request)
+    {
+        $phone=$request->phone;
+        $type=(int)$request->type;
+        $newPassword=$request->newPassword;
+        $oldPassword=$request->oldPassword;
 
+        $userInfo=users::where('phone',$phone)->first();
+
+        $code=201;
+        $msg=null;
+
+        //创建密码
+        if ($type===1)
+        {
+            $password=control::aesEncode($newPassword,$phone);
+            $userInfo->password=$password;
+            $code=200;
+            $msg='创建成功';
+        }
+
+        //修改密码
+        if ($type===2)
+        {
+            $password=$userInfo->password;
+
+            $oldPassword=control::aesEncode($oldPassword,$phone);
+
+            if ($password !== $oldPassword)
+            {
+                $code=201;
+                $msg='旧密码输入错误';
+
+            }else
+            {
+                $password=control::aesEncode($newPassword,$phone);
+                $userInfo->password=$password;
+                $code=200;
+                $msg='修改成功';
+            }
+        }
+
+        $userInfo->save();
+
+        return response()->json($this->createReturn($code,[],$msg));
+    }
 
 
 

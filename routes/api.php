@@ -31,6 +31,7 @@ Route::group(['prefix'=>'v1'],function ()
         Route::match(['get','post'],'payOrder','Business\Index\Index@payOrder');//支付订单
         Route::match(['get','post'],'getOftenCity','Business\Index\Index@getOftenCity');//获取用户常用车城市
         Route::match(['get','post'],'getUserInfo','Business\Index\Index@getUserInfo');//获取用户信息
+        Route::match(['get','post'],'payPassword','Business\Index\Index@payPassword');//支付密码
 
 
 
