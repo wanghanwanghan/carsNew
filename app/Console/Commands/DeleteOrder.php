@@ -22,7 +22,7 @@ class DeleteOrder extends Command
         //3小时前
         $time=Carbon::now()->subHours(3)->format('Y-m-d H:i:s');
 
-        $orderInfo=order::where('created_at','<',$time)->where('orderStatus','待确认')->get()->toArray();
+        $orderInfo=order::where('created_at','<',$time)->where('orderStatus','待支付')->get()->toArray();
 
         //删除
         foreach ($orderInfo as $one)

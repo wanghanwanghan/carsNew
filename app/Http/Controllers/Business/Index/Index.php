@@ -68,7 +68,7 @@ class Index extends BusinessBase
         })
             ->whereIn('carBelongId',$carBelongId)
             ->whereIn('orderType',$orderType)
-            ->whereIn('orderStatus',['待确认','已确认'])
+            ->whereIn('orderStatus',['待确认','已确认','用车中'])
             ->groupBy('carModelId')->select(DB::raw('carModelId,count(1) as num'))->get()->toArray();
 
         if (in_array('摩托',$orderType))
@@ -657,7 +657,7 @@ class Index extends BusinessBase
         $orderType=$request->orderType;
         $rentDays=(int)$request->rentDays;
         $getCarWay=$request->getCarWay;
-        $getCarPlace=$request->getCarPlace;
+        $getCarPlace=$request->getCarPlace ?? '';
         $start=$request->start ?? '';//出行用的起点
         $destination=$request->destination ?? '';//出行用的终点
 
@@ -718,8 +718,8 @@ class Index extends BusinessBase
 
         $insert=[
             'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
-            'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待确认',
-            'account'=>$phone, 'orderPrice'=>sprintf('%.2f',$payMoney), 'depositPrice'=>$damagePrice+$forfeitPrice,
+            'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待支付', 'account'=>$phone,
+            'orderPrice'=>sprintf('%.2f',$payMoney), 'damagePrice'=>$damagePrice, 'forfeitPrice'=>$forfeitPrice,
             'payWay'=>'待选择', 'payment'=>'待选择', 'startTime'=>$startTime, 'stopTime'=>$stopTime,
             'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
             'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
@@ -794,8 +794,72 @@ class Index extends BusinessBase
         $orderId=$request->orderId;
         $jsCode=$request->jsCode;
         $phone=$request->phone;
+        $payWay=(int)$request->payWay;//1是用户钱包支付
+        $payment=(int)$request->payment;//1是全款
 
-        $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId);
+        //用orderId取出该订单需要支付的所有金额再转换成XXX分钱
+
+        $orderInfo=order::where('orderId',$orderId)->first();
+
+        if ($payment===1)
+        {
+            $payMoney=$orderInfo->orderPrice + $orderInfo->damagePrice + $orderInfo->forfeitPrice;
+            $payment='全款';
+        }else
+        {
+            $payMoney=$orderInfo->forfeitPrice;
+            $payment='违章押金';
+        }
+
+        if ($payWay===1)
+        {
+            $payWay='钱包';
+
+            //查询用户余额够不够
+            $userInfo=users::where('phone',$phone)->first();
+
+            if ($userInfo->money < $payMoney)
+            {
+                return response()->json($this->createReturn(201,[],'余额不足'));
+
+            }else
+            {
+                //减去余额
+                //改状态
+
+                $userInfo->money=$userInfo->money - $payMoney;
+
+                $orderInfo->payWay=$payWay;
+                $orderInfo->payment=$payment;
+                $orderInfo->orderStatus='待确认';
+
+                $userInfo->save();
+                $orderInfo->save();
+
+                return response()->json($this->createReturn(200,[],'支付成功'));
+            }
+
+        }else
+        {
+            $payWay='微信';
+        }
+
+        //微信支付，等支付回调再修改状态
+
+        //把用户选择的状态先存一下，等支付回调的时候再修改上
+
+        $orderInfo->NotifyInfo="{$payWay}_{$payment}";
+
+        $body="极客超跑-租车服务";
+
+        //上线后删了这行
+        if (Carbon::now()->format('Ymd') < 20200815)
+        {
+            $body='1分钱测试';
+            $payMoney=0.01;
+        }
+
+        $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$payMoney);
 
         return response()->json($this->createReturn(200,$miniApp));
     }
