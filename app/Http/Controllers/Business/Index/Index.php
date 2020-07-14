@@ -771,6 +771,8 @@ class Index extends BusinessBase
 
         $userInfo=users::where('phone',$phone)->first()->toArray();
 
+        unset($userInfo['password']);
+
         //用车城市
         $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity'])->first()->toArray();
 
