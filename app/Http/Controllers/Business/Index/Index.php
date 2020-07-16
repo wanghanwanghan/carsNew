@@ -579,19 +579,39 @@ class Index extends BusinessBase
         foreach ($couponInfo as $val)
         {
             //过期了，或者还没开始
-            if ($val['expireStart'] >= time() || $val['expireStop'] <= time()) $disabled[]=$val;
+            if ($val['expireStart'] >= time() || $val['expireStop'] <= time())
+            {
+                $disabled[]=$val;
+                continue;
+            }
 
             //金额减免，未到触发金额
-            if ($val['discountWay']==='金额减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+            if ($val['discountWay']==='金额减免' && $val['needMoney'] > $payMoney)
+            {
+                $disabled[]=$val;
+                continue;
+            }
 
             //折扣减免，未到触发金额
-            if ($val['discountWay']==='折扣减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+            if ($val['discountWay']==='折扣减免' && $val['needMoney'] > $payMoney)
+            {
+                $disabled[]=$val;
+                continue;
+            }
 
             //违章押金减免，未到触发金额
-            if ($val['discountWay']==='违章押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+            if ($val['discountWay']==='违章押金减免' && $val['needMoney'] > $payMoney)
+            {
+                $disabled[]=$val;
+                continue;
+            }
 
             //车损押金减免，未到触发金额
-            if ($val['discountWay']==='车损押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+            if ($val['discountWay']==='车损押金减免' && $val['needMoney'] > $payMoney)
+            {
+                $disabled[]=$val;
+                continue;
+            }
 
             //可用的优惠券
             $available[]=$val;
@@ -930,7 +950,41 @@ class Index extends BusinessBase
         return response()->json($this->createReturn($code,[],$msg));
     }
 
+    //用户所有优惠券
+    public function getUserCoupon(Request $request)
+    {
+        $phone=$request->phone;
 
+        $type=(int)$request->type;
+
+        $couponInfo=coupon::where('phone',$phone)->get()->toArray();
+
+        $available=[];
+        $disabled=[];
+
+        foreach ($couponInfo as $val)
+        {
+            if ($val['isUse']!=0)
+            {
+                $disabled[]=$val;
+                continue;
+            }
+
+            //过期了，或者还没开始
+            if ($val['expireStart'] >= time() || $val['expireStop'] <= time())
+            {
+                $disabled[]=$val;
+                continue;
+            }
+
+            //可用的优惠券
+            $available[]=$val;
+        }
+
+        $type === 1 ? $data=$available : $data=$disabled;
+
+        return response()->json($this->createReturn(200,$data));
+    }
 
 
 
