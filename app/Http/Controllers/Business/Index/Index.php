@@ -890,6 +890,18 @@ class Index extends BusinessBase
         }else
         {
             $payWay='微信';
+
+            $payMoney='0.00';
+
+            //如果不付钱，直接修改状态
+            if ($payMoney==0)
+            {
+                $orderInfo->payWay=$payWay;
+                $orderInfo->orderStatus='待确认';
+                $orderInfo->save();
+
+                return response()->json($this->createReturn(200,[],'支付成功'));
+            }
         }
 
         //微信支付，等支付回调再修改状态
