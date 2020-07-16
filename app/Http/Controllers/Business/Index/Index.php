@@ -587,8 +587,11 @@ class Index extends BusinessBase
             //折扣减免，未到触发金额
             if ($val['discountWay']==='折扣减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
 
-            //押金减免，未到触发金额
-            if ($val['discountWay']==='押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+            //违章押金减免，未到触发金额
+            if ($val['discountWay']==='违章押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
+
+            //车损押金减免，未到触发金额
+            if ($val['discountWay']==='车损押金减免' && $val['needMoney'] > $payMoney) $disabled[]=$val;
 
             //可用的优惠券
             $available[]=$val;
@@ -771,7 +774,7 @@ class Index extends BusinessBase
 
         $userInfo=users::where('phone',$phone)->first()->toArray();
 
-        unset($userInfo['password']);
+        empty($userInfo['password']) ? $userInfo['password']=0 : $userInfo['password']=1;
 
         //用车城市
         $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity'])->first()->toArray();
