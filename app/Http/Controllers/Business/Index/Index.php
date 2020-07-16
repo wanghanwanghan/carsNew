@@ -1008,6 +1008,23 @@ class Index extends BusinessBase
         return response()->json($this->createReturn(200,$data));
     }
 
+    //查看订单
+    public function orderInfo(Request $request)
+    {
+        $phone=$request->phone;
+
+        $orderId=$request->orderId ?? '';
+
+        if (!empty($orderId))
+        {
+            $data=order::where('orderId',$orderId)->first()->toArray();
+        }else
+        {
+            $data=order::where('phone',$phone)->get()->toArray();
+        }
+
+        return response()->json($this->createReturn(200,$data));
+    }
 
 
 
