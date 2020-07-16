@@ -33,6 +33,7 @@ Route::group(['prefix'=>'v1'],function ()
         Route::match(['get','post'],'getUserInfo','Business\Index\Index@getUserInfo');//获取用户信息
         Route::match(['get','post'],'payPassword','Business\Index\Index@payPassword');//支付密码
         Route::match(['get','post'],'getUserCoupon','Business\Index\Index@getUserCoupon');//用户所有优惠券
+        Route::match(['get','post'],'orderInfo','Business\Index\Index@orderInfo');//订单
 
 
 
