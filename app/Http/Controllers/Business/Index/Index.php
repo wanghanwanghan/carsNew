@@ -906,7 +906,7 @@ class Index extends BusinessBase
         if (Carbon::now()->format('Ymd') < 20200815)
         {
             $body='1分钱测试';
-            $payMoney=0.00;
+            $payMoney=0.01;
         }
 
         $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$payMoney);
