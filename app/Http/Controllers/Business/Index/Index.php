@@ -892,7 +892,7 @@ class Index extends BusinessBase
             $payWay='微信';
 
             //如果不付钱，直接修改状态
-            if ($payMoney==0)
+            if ($payMoney <= 0)
             {
                 $orderInfo->payWay=$payWay;
                 $orderInfo->orderStatus='待确认';
