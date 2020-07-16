@@ -891,8 +891,6 @@ class Index extends BusinessBase
         {
             $payWay='微信';
 
-            $payMoney='0.00';
-
             //如果不付钱，直接修改状态
             if ($payMoney==0)
             {
