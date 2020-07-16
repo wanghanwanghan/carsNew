@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Models\coupon;
 use App\Http\Models\order;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -27,7 +28,30 @@ class DeleteOrder extends Command
         //删除
         foreach ($orderInfo as $one)
         {
-            order::find($one['id'])->delete();
+            $info=order::find($one['id']);
+
+            if (is_numeric($info->coupon1) && $info->coupon1!=0)
+            {
+                $coupon=coupon::find($info->coupon1);
+                $coupon->isUse=0;
+                $coupon->save();
+            }
+
+            if (is_numeric($info->coupon2) && $info->coupon2!=0)
+            {
+                $coupon=coupon::find($info->coupon2);
+                $coupon->isUse=0;
+                $coupon->save();
+            }
+
+            if (is_numeric($info->coupon3) && $info->coupon3!=0)
+            {
+                $coupon=coupon::find($info->coupon3);
+                $coupon->isUse=0;
+                $coupon->save();
+            }
+
+            $info->delete();
         }
 
         return true;

@@ -722,13 +722,25 @@ class Index extends BusinessBase
         {
             $couponInfo=coupon::find($couponId)->first();
 
+            switch ($couponInfo->discountWay)
+            {
+                case '金额减免':
+                    $payMoney=$payMoney - $couponInfo->discount;
+                    break;
+                case '折扣减免':
+                    $payMoney=$payMoney - ($payMoney * $couponInfo->discount * 0.01);
+                    break;
+                case '违章押金减免':
+                    $forfeitPrice=$forfeitPrice - $couponInfo->discount;
+                    break;
+                case '车损押金减免':
+                    $damagePrice=$damagePrice - $couponInfo->discount;
+                    break;
+                default:
+            }
 
-
-
-
-
-
-
+            $couponInfo->isUse=1;
+            $couponInfo->save();
         }
 
         if ($getCarWay==1)
@@ -894,7 +906,7 @@ class Index extends BusinessBase
         if (Carbon::now()->format('Ymd') < 20200815)
         {
             $body='1分钱测试';
-            $payMoney=0.01;
+            $payMoney=0.00;
         }
 
         $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$payMoney);
