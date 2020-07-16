@@ -1020,7 +1020,7 @@ class Index extends BusinessBase
             $data=order::where('orderId',$orderId)->first()->toArray();
         }else
         {
-            $data=order::where('phone',$phone)->get()->toArray();
+            $data=order::where('account',$phone)->get()->toArray();
         }
 
         return response()->json($this->createReturn(200,$data));
