@@ -356,11 +356,13 @@ class AdminController extends AdminBase
         {
             //要插入数据了
             $data=[
+                'name'=>$request->name ?? Str::random(),//活动名称
                 'image'=>$request->image ?? Str::random(),//图片地址
                 'isShow'=>$request->isShow ?? 1,//是否显示
                 'level'=>$request->level ?? mt_rand(1,100),//权重
                 'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
                 'href'=>$request->href ?? Str::random(),//跳转地址
+                'contents'=>$request->contents ?? '空',//富文本
             ];
 
             try
