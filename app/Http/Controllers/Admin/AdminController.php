@@ -100,6 +100,21 @@ class AdminController extends AdminBase
             $tmp['total']=$carModelList->count();
             $tmp['list']=$carModelList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
 
+            //计算一辆车，在哪个车行有多少库存
+            foreach ($tmp['list'] as &$oneCar)
+            {
+                $rel=carModelCarBelong::where('carModelId',$oneCar->id)->get()->toArray();
+
+                foreach ($rel as &$one)
+                {
+                    $one['carBelong']=carBelong::where('id',$one['carBelongId'])->first()->toArray();
+                }
+                unset($one);
+
+                $oneCar->carBelongInfo=$rel;
+            }
+            unset($oneCar);
+
             $res=[
                 'carType'=>$carType,
                 'carBrand'=>$carBrand,
