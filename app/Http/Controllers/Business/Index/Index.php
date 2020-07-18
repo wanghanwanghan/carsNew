@@ -540,7 +540,7 @@ class Index extends BusinessBase
         $rentDays=$request->rentDays;
 
         //找出这辆车需要花费多少钱
-        $carInfo=carModel::find($carModelId)->first();
+        $carInfo=carModel::find($carModelId);
 
         //车损押金
         $damagePrice=$carInfo->damagePrice;
@@ -690,7 +690,7 @@ class Index extends BusinessBase
         $orderId=control::getUuid();
 
         //日租还是出行，还是摩托的价格
-        $carInfo=carModel::find($carModelId)->first();
+        $carInfo=carModel::find($carModelId);
 
         switch ($orderType)
         {
@@ -720,7 +720,7 @@ class Index extends BusinessBase
         //如果有优惠券
         if (!empty($couponId))
         {
-            $couponInfo=coupon::find($couponId)->first();
+            $couponInfo=coupon::find($couponId);
 
             switch ($couponInfo->discountWay)
             {
@@ -747,7 +747,7 @@ class Index extends BusinessBase
         {
             $getCarWay='自取';
 
-            $getCarPlace=carBelong::find($carBelongId)->first()->address;
+            $getCarPlace=carBelong::find($carBelongId)->address;
 
         }else
         {
@@ -809,7 +809,7 @@ class Index extends BusinessBase
         empty($userInfo['password']) ? $userInfo['password']=0 : $userInfo['password']=1;
 
         //用车城市
-        $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity'])->first()->toArray();
+        $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity'])->toArray();
 
         //驾照的几个状态
         $status=[
