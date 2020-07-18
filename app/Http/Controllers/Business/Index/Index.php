@@ -724,6 +724,11 @@ class Index extends BusinessBase
         {
             $couponInfo=coupon::find($couponId);
 
+            if ($couponInfo->isUse != 0)
+            {
+                return response()->json($this->createReturn(201,[''],'优惠券已经使用'));
+            }
+
             switch ($couponInfo->discountWay)
             {
                 case '金额减免':
