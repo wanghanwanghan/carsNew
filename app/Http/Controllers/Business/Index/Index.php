@@ -82,7 +82,7 @@ class Index extends BusinessBase
                 //没有订单，哪种车型都能租
                 $carModelId=carModelCarBelong::whereIn('carBelongId',$carBelongId)->get(['carModelId'])->toArray();
 
-                $carId=Arr::flatten($carModelId);
+                $carId=array_values(Arr::flatten($carModelId));
 
             }else
             {
@@ -109,10 +109,12 @@ class Index extends BusinessBase
                 }
 
                 $carId=$kuCun;
+
+                $carId=array_keys($carId);
             }
         }
 
-        return array_keys($carId);
+        return $carId;
     }
 
     //返回全局变量
