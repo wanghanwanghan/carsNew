@@ -461,7 +461,7 @@ class AdminController extends AdminBase
             if (is_numeric($cond))
             {
                 //手机号
-                $res->where('account',$cond)
+                $res=$res->where('account',$cond)
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
@@ -469,7 +469,7 @@ class AdminController extends AdminBase
             }else
             {
                 //订单号
-                $res->where('orderId','like',"%{$cond}%")
+                $res=$res->where('orderId','like',"%{$cond}%")
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
             }
