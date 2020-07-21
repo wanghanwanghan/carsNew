@@ -476,7 +476,17 @@ class AdminController extends AdminBase
         }
         unset($one);
 
-        return response()->json($this->createReturn(200,$res,''));
+        //总的数据条数
+        $total1=order::where('orderType','自驾')->count();
+        $total2=order::where('orderType','出行')->count();
+        $total3=order::where('orderType','摩托')->count();
+
+        $tmp['list']=$res;
+        $tmp['total']['自驾']=$total1;
+        $tmp['total']['出行']=$total2;
+        $tmp['total']['摩托']=$total3;
+
+        return response()->json($this->createReturn(200,$tmp,''));
     }
 
 
