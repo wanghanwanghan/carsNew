@@ -14,6 +14,7 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
+use App\Http\Models\users;
 use App\Http\Service\UploadImg;
 use Geohash\GeoHash;
 use Illuminate\Database\Schema\Blueprint;
@@ -465,7 +466,6 @@ class AdminController extends AdminBase
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
-
             }else
             {
                 //订单号
@@ -495,6 +495,11 @@ class AdminController extends AdminBase
 
             $carModel ? $one['carModel']=$carModel : $one['carModel']=null;
             $carBrand ? $one['carBrand']=$carBrand : $one['carBrand']=null;
+
+            //补全用户信息
+            $userInfo=users::where('phone',$one['account'])->first();
+
+            $userInfo ? $one['userInfo']=$userInfo : $one['userInfo']=null;
         }
         unset($one);
 
