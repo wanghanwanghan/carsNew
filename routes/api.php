@@ -15,6 +15,9 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'create/banner','Admin\AdminController@createBanner');//创建banner
     Route::match(['get','post'],'create/bannerAction','Admin\AdminController@createBannerAction');//创建banner的活动页
 
+    Route::match(['get','post'],'get/order','Admin\AdminController@getOrder');//获取订单
+
+
 
 });
 

@@ -13,6 +13,7 @@ use App\Http\Models\carModelCarBelong;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
+use App\Http\Models\order;
 use App\Http\Service\UploadImg;
 use Geohash\GeoHash;
 use Illuminate\Database\Schema\Blueprint;
@@ -442,7 +443,41 @@ class AdminController extends AdminBase
         }
     }
 
+    //获取订单
+    public function getOrder(Request $request)
+    {
+        $orderType=$request->orderType ?? '自驾';
+        $orderBy=$request->orderBy ?? 'created_at,desc';
+        $orderBy=explode(',',$orderBy);
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 10;
 
+        //当前查看的orderType
+        $res=order::where('orderType',$orderType)
+            ->orderBy(head($orderBy),last($orderBy))
+            ->paginate($pageSize,['*'],'',$page)->toArray();
+
+        $res=$res['data'];
+
+        foreach ($res as &$one)
+        {
+            //补全优惠券信息
+            $one['coupon1']=coupon::where('id',$one['coupon1'])->first();
+            $one['coupon2']=coupon::where('id',$one['coupon2'])->first();
+            $one['coupon3']=coupon::where('id',$one['coupon3'])->first();
+
+            //补全车辆型号
+            //补全车辆品牌
+            $carModel=carModel::where('id',$one['carModelId'])->first();
+            $carBrand=carBrand::where('id',$carModel->carBrandId)->first();
+
+            $carModel ? $one['carModel']=$carModel : $one['carModel']=null;
+            $carBrand ? $one['carBrand']=$carBrand : $one['carBrand']=null;
+        }
+        unset($one);
+
+        return response()->json($this->createReturn(200,$res,''));
+    }
 
 
 
