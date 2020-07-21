@@ -448,14 +448,36 @@ class AdminController extends AdminBase
     {
         $orderType=$request->orderType ?? '自驾';
         $orderBy=$request->orderBy ?? 'created_at,desc';
+        $cond=$request->cond ?? '';
         $orderBy=explode(',',$orderBy);
         $page=$request->page ?? 1;
         $pageSize=$request->pageSize ?? 10;
 
         //当前查看的orderType
-        $res=order::where('orderType',$orderType)
-            ->orderBy(head($orderBy),last($orderBy))
-            ->paginate($pageSize,['*'],'',$page)->toArray();
+        $res=order::where('orderType',$orderType);
+
+        if (!empty($cond))
+        {
+            if (is_numeric($cond))
+            {
+                //手机号
+                $res->where('account',$cond)
+                    ->orderBy(head($orderBy),last($orderBy))
+                    ->paginate($pageSize,['*'],'',$page)->toArray();
+
+
+            }else
+            {
+                //订单号
+                $res->where('orderId','like',"%{$cond}%")
+                    ->orderBy(head($orderBy),last($orderBy))
+                    ->paginate($pageSize,['*'],'',$page)->toArray();
+            }
+
+        }else
+        {
+            $res=$res->orderBy(head($orderBy),last($orderBy))->paginate($pageSize,['*'],'',$page)->toArray();
+        }
 
         $res=$res['data'];
 
