@@ -466,17 +466,32 @@ class AdminController extends AdminBase
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
+                //总的数据条数
+                $total1=order::where('orderType','自驾')->where('account',$cond)->count();
+                $total2=order::where('orderType','出行')->where('account',$cond)->count();
+                $total3=order::where('orderType','摩托')->where('account',$cond)->count();
+
             }else
             {
                 //订单号
                 $res=$res->where('orderId','like',"%{$cond}%")
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
+
+                //总的数据条数
+                $total1=order::where('orderType','自驾')->where('orderId','like',"%{$cond}%")->count();
+                $total2=order::where('orderType','出行')->where('orderId','like',"%{$cond}%")->count();
+                $total3=order::where('orderType','摩托')->where('orderId','like',"%{$cond}%")->count();
             }
 
         }else
         {
             $res=$res->orderBy(head($orderBy),last($orderBy))->paginate($pageSize,['*'],'',$page)->toArray();
+
+            //总的数据条数
+            $total1=order::where('orderType','自驾')->count();
+            $total2=order::where('orderType','出行')->count();
+            $total3=order::where('orderType','摩托')->count();
         }
 
         $res=$res['data'];
@@ -585,11 +600,6 @@ class AdminController extends AdminBase
             $one['forfeitStatus']['day']=$day;
         }
         unset($one);
-
-        //总的数据条数
-        $total1=order::where('orderType','自驾')->count();
-        $total2=order::where('orderType','出行')->count();
-        $total3=order::where('orderType','摩托')->count();
 
         $tmp['list']=$res;
         $tmp['total']['自驾']=$total1;
