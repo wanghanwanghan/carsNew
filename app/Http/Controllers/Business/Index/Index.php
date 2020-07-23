@@ -919,13 +919,6 @@ class Index extends BusinessBase
 
         $body="极客超跑-租车服务";
 
-        //上线后删了这行
-        if (Carbon::now()->format('Ymd') < 20200815)
-        {
-            $body='1分钱测试';
-            $payMoney=0.01;
-        }
-
         $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$payMoney);
 
         return response()->json($this->createReturn(200,$miniApp));

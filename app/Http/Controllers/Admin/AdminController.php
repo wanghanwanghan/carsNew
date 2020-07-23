@@ -14,12 +14,14 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
+use App\Http\Models\refundInfo;
 use App\Http\Models\users;
 use App\Http\Service\UploadImg;
 use Geohash\GeoHash;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -30,8 +32,6 @@ class AdminController extends AdminBase
     //后台用户登录
     public function login(Request $request)
     {
-        $this->createTable();
-
         $username=$request->username;
         $password=$request->password;
 
@@ -500,6 +500,53 @@ class AdminController extends AdminBase
             $userInfo=users::where('phone',$one['account'])->first();
 
             $userInfo ? $one['userInfo']=$userInfo : $one['userInfo']=null;
+
+            //补全退款信息
+            $one['refundInfo']=[];
+            $damageRefund=null;
+            $forfeitRefund=null;
+
+            //先确定订单可不可退，待支付的订单不可退
+            if (in_array($one['orderStatus'],['待支付','已退单']))
+            {
+                $one['refundInfo']['canRefund']=0;
+
+            }else
+            {
+                //如果可退
+                $one['refundInfo']['canRefund']=1;
+
+                //$payment是 全款 说明有车损押金和违章押金 或者 违章押金 说明只有违章押金
+
+                if ($one['payment']==='全款')
+                {
+                    //车损退了多少
+                    $damageRefund=refundInfo::where(['orderId'=>$one['orderId'],'refundType'=>2])
+                        ->select(DB::raw('sum(refundPrice) as refundPrice'))->get()->toArray();
+                    $damageRefund=(int)head(Arr::flatten($damageRefund));
+
+                    //违章退了多少
+                    $forfeitRefund=refundInfo::where(['orderId'=>$one['orderId'],'refundType'=>3])
+                        ->select(DB::raw('sum(refundPrice) as refundPrice'))->get()->toArray();
+                    $forfeitRefund=(int)head(Arr::flatten($forfeitRefund));
+
+                    $one['refundInfo']['damageRefund']=$damageRefund;
+                    $one['refundInfo']['forfeitRefund']=$forfeitRefund;
+
+                }elseif ($one['payment']==='违章押金')
+                {
+                    //违章退了多少
+                    $forfeitRefund=refundInfo::where(['orderId'=>$one['orderId'],'refundType'=>3])
+                        ->select(DB::raw('sum(refundPrice) as refundPrice'))->get()->toArray();
+                    $forfeitRefund=(int)head(Arr::flatten($forfeitRefund));
+
+                    $one['refundInfo']['forfeitRefund']=$forfeitRefund;
+
+                }else
+                {
+                    continue;
+                }
+            }
         }
         unset($one);
 
@@ -516,6 +563,34 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,$tmp,''));
     }
 
+    //创建退款任务
+    public function refundOrder(Request $request)
+    {
+        $orderId=$request->orderId ?? '';
+        $refundType=$request->refundType ?? 1;
+        $refundPrice=$request->refundPrice ?? 0.01;
+        $day=$request->day ?? 1;
+        $password=$request->password ?? '*#06#';
+
+        $orderInfo=order::where('orderId',$orderId)->first();
+
+        refundInfo::create([
+            'phone'=>$orderInfo->account,
+            'orderId'=>$orderInfo->orderId,
+            'refundId'=>control::getUuid(16),
+            'refundType'=>$refundType,
+            'refundPrice'=>$refundPrice,
+            'day'=>$day,
+            'refundTime'=>time() + 86400 * $day,
+            'isFinish'=>0,
+        ]);
+
+        return response()->json($this->createReturn(200,[],'success'));
+    }
+
+
+
+
 
 
 
@@ -524,139 +599,19 @@ class AdminController extends AdminBase
 
     private function createTable()
     {
-        //不用动
-        //品牌表
-        if (!Schema::hasTable('carBrand')) {}
-
-        //牌照表
-        //不用动
-        if (!Schema::hasTable('carLicenseType')) {}
-
-        //车辆型号
-        if (!Schema::hasTable('carModel'))
+        if (!Schema::hasTable('refundInfo'))
         {
-            Schema::create('carModel',function (Blueprint $table)
+            Schema::create('refundInfo',function (Blueprint $table)
             {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->string('carModel',30)->comment('车辆型号');
-                $table->text('carImg')->comment('车辆图片');
-                $table->integer('carType')->unsigned()->comment('车辆类型表id');
-                $table->integer('carBrandId')->unsigned()->comment('车辆品牌表id');
-                $table->string('carDesc')->comment('描述');
-                $table->integer('level')->unsigned()->comment('权重');
-                $table->integer('damagePrice')->unsigned()->comment('车损押金');
-                $table->integer('forfeitPrice')->unsigned()->comment('违章押金');
-                $table->integer('dayPrice')->unsigned()->comment('日租价格');
-                $table->integer('dayDiscount')->unsigned()->comment('日租折扣');
-                $table->integer('goPrice')->unsigned()->comment('出行价格');
-                $table->integer('goDiscount')->unsigned()->comment('出行折扣');
-                $table->integer('kilPrice')->unsigned()->comment('每公里价格');
-            });
-        }
-
-        //标签表
-        if (!Schema::hasTable('carLabel'))
-        {
-            Schema::create('carLabel',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->string('label',30)->comment('标签名称');
-            });
-        }
-
-        //车型-标签关联表
-        if (!Schema::hasTable('carModelLabel'))
-        {
-            Schema::create('carModelLabel',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->integer('carModelId')->unsigned()->comment('车型表id');
-                $table->integer('carLabelId')->unsigned()->comment('标签表id');
-            });
-        }
-
-        //车型-车行关联表
-        if (!Schema::hasTable('carModelCarBelong'))
-        {
-            Schema::create('carModelCarBelong',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->integer('carModelId')->unsigned()->comment('车辆型号表id');
-                $table->integer('carBelongId')->unsigned()->comment('车行表id');
-                $table->integer('carNum')->unsigned()->comment('车辆库存');
-            });
-        }
-
-        //车行表
-        if (!Schema::hasTable('carBelong'))
-        {
-            Schema::create('carBelong',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->string('name',30)->comment('车行名称');
-                $table->string('lng',30)->comment('经度');
-                $table->string('lat',30)->comment('纬度');
-                $table->string('geo',30)->comment('geo');
-                $table->integer('cityId')->unsigned()->comment('城市表id');
-                $table->string('address')->comment('地址');
-                $table->string('tel',30)->comment('座机');
-                $table->string('phone',30)->comment('手机');
-                $table->string('open',30)->comment('营业时间');
-                $table->string('close',30)->comment('打烊时间');
-            });
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if (!Schema::hasTable('bannerAction'))
-        {
-            Schema::create('bannerAction',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
-                $table->string('long')->comment('长标题');
-                $table->string('short')->comment('短标题');
-                $table->text('contents')->comment('内容');
-                $table->integer('click')->unsigned()->comment('点击量');
-                $table->integer('createAt')->unsigned()->comment('创建时间');
-            });
-        }
-
-        if (!Schema::hasTable('order'))
-        {
-            Schema::create('order',function (Blueprint $table)
-            {
-                $table->increments('id')->unsigned()->comment('主键');
+                $table->bigInteger('id')->autoIncrement()->unsigned()->comment('主键');
+                $table->string('phone',50)->comment('手机号')->index();
                 $table->string('orderId',50)->comment('订单号')->index();
-                $table->integer('coupon1')->unsigned()->comment('优惠券1');
-                $table->integer('coupon2')->unsigned()->comment('优惠券2');
-                $table->integer('coupon3')->unsigned()->comment('优惠券3');
-                $table->integer('carModelId')->unsigned()->comment('车辆类型表id')->index();
-                $table->integer('carBelongId')->unsigned()->comment('车行表id')->index();
-                $table->string('orderType',50)->comment('自驾/出行/摩托');
-                $table->string('orderStatus',50)->comment('待确认/已确认/用车中/已完成');
-                $table->string('account',50)->comment('就是手机号')->index();
-                $table->integer('orderPrice')->unsigned()->comment('订单金额');
-                $table->integer('depositPrice')->unsigned()->comment('押金金额');
-                $table->string('payWay',50)->comment('钱包/微信');
-                $table->string('payment',50)->comment('只交押金/交全款');
-                $table->integer('startTime')->unsigned()->comment('开始时间')->index();
-                $table->integer('stopTime')->unsigned()->comment('结束时间')->index();
-                $table->string('getCarWay',50)->comment('自取/送车');
-                $table->string('getCarPlace')->comment('取车地点');
-                $table->string('rentPersonName',50)->comment('租车人');
-                $table->string('rentPersonPhone',50)->comment('租车电话');
-                $table->string('start')->comment('起点');
-                $table->string('destination')->comment('终点');
+                $table->string('refundId',50)->comment('退款单号');
+                $table->tinyInteger('refundType')->unsigned()->comment('1是退全款，2是车损押金，3是违章押金');
+                $table->decimal('refundPrice',10,2)->unsigned()->comment('退款金额');
+                $table->tinyInteger('day')->unsigned()->comment('延迟几天退款');
+                $table->integer('refundTime')->unsigned()->comment('退款时间')->index();
+                $table->tinyInteger('isFinish')->unsigned()->comment('是否退完');
                 $table->timestamps();
             });
         }

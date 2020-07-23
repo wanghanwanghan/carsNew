@@ -2,6 +2,7 @@
 
 namespace App\Http\Service;
 
+use App\Http\Models\order;
 use wanghanwanghan\someUtils\traits\Singleton;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -53,20 +54,17 @@ class MiniAppPay
     }
 
     //退款
-    public function refundOrder($orderId)
+    public function refundOrder($orderId='',$refundId='',$body='1分钱测试',$totalFee=100,$refundFee=100)
     {
         $order = [
             'out_trade_no' => $orderId,
-            'out_refund_no' => time(),
-            'total_fee' => '1',
-            'refund_fee' => '1',
-            'refund_desc' => '全额退款',
+            'out_refund_no' => $refundId,
+            'total_fee' => $totalFee * 100,//订单总的支付金额
+            'refund_fee' => $refundFee * 100,//退款金额
+            'refund_desc' => $body,
             'type' => 'miniapp'
         ];
 
-        $result = Pay::wechat()->refund($order);
-
-
-        dd($result);
+        return Pay::wechat()->refund($order);
     }
 }

@@ -24,7 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        //删除无用订单
         $schedule->command('deleteOrder')->hourly()->withoutOverlapping();
+
+        //自动退款
+        $schedule->command('refundOrder')->hourly()->withoutOverlapping();
     }
 
     /**
