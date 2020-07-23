@@ -588,6 +588,20 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[],'success'));
     }
 
+    //设置订单为已完成状态
+    public function setOrderStatus(Request $request)
+    {
+        $orderId=$request->orderId ?? 1;
+
+        $orderInfo=order::where('orderId',$orderId)->first();
+
+        $orderInfo->orderStatus='已完成';
+
+        $orderInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
 
 
 

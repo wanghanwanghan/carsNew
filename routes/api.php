@@ -17,6 +17,7 @@ Route::group(['prefix'=>'admin'],function ()
 
     Route::match(['get','post'],'get/order','Admin\AdminController@getOrder');//获取订单
     Route::match(['get','post'],'refund/order','Admin\AdminController@refundOrder');//订单退款
+    Route::match(['get','post'],'setStatus/order','Admin\AdminController@setOrderStatus');//修改订单状态为已完成
 
 
 
