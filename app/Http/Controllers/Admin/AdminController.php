@@ -638,6 +638,21 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //修改订单中的违章押金金额
+    public function setForfeitPriceOrder(Request $request)
+    {
+        $orderId=$request->orderId ?? 1;
+        $forfeitPrice=$request->forfeitPrice ?? 2000;
+
+        $orderInfo=order::where('orderId',$orderId)->first();
+
+        $orderInfo->forfeitPrice=$forfeitPrice;
+
+        $orderInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
 
 
 
