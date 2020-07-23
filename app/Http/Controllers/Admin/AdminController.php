@@ -547,6 +547,42 @@ class AdminController extends AdminBase
                     continue;
                 }
             }
+
+            //押金状态
+            if ($one['stopTime'] > time())
+            {
+                $status='锁定';
+                $day=0;
+            }else
+            {
+                $status='待退';
+                $day=0;
+                //看看退违章的时间
+                $info=refundInfo::where(['orderId'=>$one['orderId'],'refundType'=>3])
+                    ->orderBy('created_at','desc')->first();
+
+                if (empty($info))
+                {
+                    //没有退单记录
+                    $day=365;
+                }else
+                {
+                    //有退单记录
+                    //先看是不是已经退了
+                    if ($info->isFinish==1)
+                    {
+                        $status='已退';
+                    }else
+                    {
+                        $day=($info->refundTime - time()) / 86400;
+                        $day=(int)$day;
+                    }
+
+                }
+            }
+
+            $one['forfeitStatus']['status']=$status;
+            $one['forfeitStatus']['day']=$day;
         }
         unset($one);
 
