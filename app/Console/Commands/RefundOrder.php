@@ -9,6 +9,7 @@ use App\Http\Service\MiniAppPay;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class RefundOrder extends Command
 {
@@ -24,6 +25,7 @@ class RefundOrder extends Command
     public function handle()
     {
         //确定对象
+        //$refundOrders=refundInfo::where('refundTime','<',time())->where('isFinish',0)->get()->toArray();
         $refundOrders=[];
 
         foreach ($refundOrders as $oneRefundOrder)
@@ -78,7 +80,10 @@ class RefundOrder extends Command
             $totalFee=$orderInfo['orderPrice']+$orderInfo['damagePrice']+$orderInfo['forfeitPrice'] :
             $totalFee=$orderInfo['forfeitPrice'];
 
-        MiniAppPay::getInstance()->refundOrder($orderInfo['orderId'],$refundInfo['refundId'],$body,$totalFee,$refMoney);
+        $res=MiniAppPay::getInstance()->refundOrder($orderInfo['orderId'],$refundInfo['refundId'],$body,$totalFee,$refMoney);
+
+        Redis::set("{$orderInfo['orderId']}_{$refundInfo['refundInfo']}",json_encode($res));
+        Redis::expire("{$orderInfo['orderId']}_{$refundInfo['refundInfo']}",86400);
 
         return true;
     }

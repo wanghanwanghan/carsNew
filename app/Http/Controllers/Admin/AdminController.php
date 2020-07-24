@@ -448,8 +448,14 @@ class AdminController extends AdminBase
     public function getOrder(Request $request)
     {
         $orderType=$request->orderType ?? '自驾';
-        $orderStatus=$request->orderStatus ?? ['待支付','待确认','已确认','用车中','已完成','已退单'];
-        is_array($orderStatus) ?: $orderStatus=[$orderStatus];
+        $orderStatus=$request->orderStatus;
+        if (empty($orderStatus))
+        {
+            $orderStatus=['待支付','待确认','已确认','用车中','已完成','已退单'];
+        }else
+        {
+            $orderStatus=[$orderStatus];
+        }
         $orderBy=$request->orderBy ?? 'created_at,desc';
         $cond=$request->cond ?? '';
         $orderBy=explode(',',$orderBy);
