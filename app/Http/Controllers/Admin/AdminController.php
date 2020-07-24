@@ -732,6 +732,84 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //获取用户列表
+    public function getUserList(Request $request)
+    {
+        $cond=$request->cond ?? '';
+
+        $offset=$this->offset($request);
+
+        if (empty($cond))
+        {
+            $userInfo=users::where('phone','like',"1%");
+            $total=users::where('phone','like',"1%")->count();
+        }else
+        {
+            $userInfo=users::where('phone','like',"%{$cond}%");
+            $total=users::where('phone','like',"%{$cond}%")->count();
+        }
+
+        $userInfo=$userInfo->orderBy('created_at','desc')
+            ->offset(head($offset))->limit(last($offset))
+            ->get()->toArray();
+
+        foreach ($userInfo as &$one)
+        {
+            //这个用户订了几次车
+            $one['orderNum']=order::where('account',$one['phone'])->count();
+
+            //真实密码
+            $one['realPassword']=control::aesDecode($one['password'],$one['phone']);
+
+            //累计充值
+            $one['purchaseMoney']=0;
+        }
+        unset($one);
+
+        $tmp['list']=$userInfo;
+        $tmp['total']=$total;
+
+        return response()->json($this->createReturn(200,$tmp));
+    }
+
+    //修改用户备注
+    public function setRemarkUser(Request $request)
+    {
+        $phone=$request->phone ?? 13800138000;
+
+        $remark=$request->remark ?? '无';
+
+        $userInfo=users::where('phone',$phone)->first();
+
+        $userInfo->remark=$remark;
+
+        $userInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //修改用户备注
+    public function setRemarkOrder(Request $request)
+    {
+        $orderId=$request->orderId ?? 123123;
+
+        $remark=$request->remark ?? '无';
+
+        $orderInfo=order::where('orderId',$orderId)->first();
+
+        $orderInfo->remark=$remark;
+
+        $orderInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+
+
+
+
+
+
 
 
 

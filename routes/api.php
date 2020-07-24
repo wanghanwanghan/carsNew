@@ -21,6 +21,9 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'setForfeitPrice/order','Admin\AdminController@setForfeitPriceOrder');
     Route::match(['get','post'],'get/license','Admin\AdminController@getLicense');//获取证件
     Route::match(['get','post'],'setStatus/license','Admin\AdminController@setLicenseStatus');//修改证件审核状态
+    Route::match(['get','post'],'get/user','Admin\AdminController@getUserList');//获取用户列表
+    Route::match(['get','post'],'setRemark/user','Admin\AdminController@setRemarkUser');//修改用户的备注
+    Route::match(['get','post'],'setRemark/order','Admin\AdminController@setRemarkOrder');//修改订单的备注
 
 
 
