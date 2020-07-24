@@ -19,6 +19,8 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'refund/order','Admin\AdminController@refundOrder');//订单退款
     Route::match(['get','post'],'setStatus/order','Admin\AdminController@setOrderStatus');//修改订单状态为已完成
     Route::match(['get','post'],'setForfeitPrice/order','Admin\AdminController@setForfeitPriceOrder');
+    Route::match(['get','post'],'get/license','Admin\AdminController@getLicense');//获取证件
+    Route::match(['get','post'],'setStatus/license','Admin\AdminController@setLicenseStatus');//修改证件审核状态
 
 
 

@@ -448,6 +448,8 @@ class AdminController extends AdminBase
     public function getOrder(Request $request)
     {
         $orderType=$request->orderType ?? '自驾';
+        $orderStatus=$request->orderStatus ?? ['待支付','待确认','已确认','用车中','已完成','已退单'];
+        is_array($orderStatus) ?: $orderStatus=[$orderStatus];
         $orderBy=$request->orderBy ?? 'created_at,desc';
         $cond=$request->cond ?? '';
         $orderBy=explode(',',$orderBy);
@@ -462,7 +464,7 @@ class AdminController extends AdminBase
             if (is_numeric($cond))
             {
                 //手机号
-                $res=$res->where('account',$cond)
+                $res=$res->where('account',$cond)->whereIn('orderStatus',$orderStatus)
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
@@ -474,7 +476,7 @@ class AdminController extends AdminBase
             }else
             {
                 //订单号
-                $res=$res->where('orderId','like',"%{$cond}%")
+                $res=$res->where('orderId','like',"%{$cond}%")->whereIn('orderStatus',$orderStatus)
                     ->orderBy(head($orderBy),last($orderBy))
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
@@ -486,7 +488,9 @@ class AdminController extends AdminBase
 
         }else
         {
-            $res=$res->orderBy(head($orderBy),last($orderBy))->paginate($pageSize,['*'],'',$page)->toArray();
+            $res=$res->whereIn('orderStatus',$orderStatus)
+                ->orderBy(head($orderBy),last($orderBy))
+                ->paginate($pageSize,['*'],'',$page)->toArray();
 
             //总的数据条数
             $total1=order::where('orderType','自驾')->count();
@@ -663,8 +667,64 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //审核证件列表
+    public function getLicense(Request $request)
+    {
+        $licenseType=$request->licenseType ?? 1;
 
+        $offset=$this->offset($request);
 
+        $userInfo=users::where('isCarLicensePass',$licenseType)
+            ->orWhere('isMotorLicensePass',$licenseType)
+            ->orWhere('isIdCardPass',$licenseType)
+            ->orWhere('isPassportPass',$licenseType)
+            ->orderBy('updated_at')->offset(head($offset))->limit(last($offset))->get()->toArray();
+
+        $count=users::where('isCarLicensePass',$licenseType)
+            ->orWhere('isMotorLicensePass',$licenseType)
+            ->orWhere('isIdCardPass',$licenseType)
+            ->orWhere('isPassportPass',$licenseType)->count();
+
+        foreach ($userInfo as &$one)
+        {
+            if (is_numeric($one['oftenCity']))
+            {
+                $one['oftenCity']=chinaArea::find($one['oftenCity']);
+            }
+        }
+        unset($one);
+
+        $tmp['list']=$userInfo;
+        $tmp['total']=$count;
+
+        return response()->json($this->createReturn(200,$tmp));
+    }
+
+    //修改证件审核状态
+    public function setLicenseStatus(Request $request)
+    {
+        $phone=$request->phone ?? 13800138000;
+
+        $isCarLicensePass=$request->isCarLicensePass ?? 2;
+        $isMotorLicensePass=$request->isMotorLicensePass ?? 2;
+        $isIdCardPass=$request->isIdCardPass ?? 2;
+        $isPassportPass=$request->isPassportPass ?? 2;
+
+        $reason=$request->reason ?? '';
+
+        $userInfo=users::where('phone',$phone)->first();
+
+        $userInfo->isCarLicensePass=$isCarLicensePass;
+        $userInfo->isMotorLicensePass=$isMotorLicensePass;
+        $userInfo->isIdCardPass=$isIdCardPass;
+        $userInfo->isPassportPass=$isPassportPass;
+
+        $userInfo->reason=$reason;
+
+        $userInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 
