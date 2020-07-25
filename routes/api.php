@@ -24,6 +24,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'get/user','Admin\AdminController@getUserList');//获取用户列表
     Route::match(['get','post'],'setRemark/user','Admin\AdminController@setRemarkUser');//修改用户的备注
     Route::match(['get','post'],'setRemark/order','Admin\AdminController@setRemarkOrder');//修改订单的备注
+    Route::match(['get','post'],'get/purchase','Admin\AdminController@getPurchaseList');//充值页面
 
 
 
@@ -45,6 +46,8 @@ Route::group(['prefix'=>'v1'],function ()
         Route::match(['get','post'],'payPassword','Business\Index\Index@payPassword');//支付密码
         Route::match(['get','post'],'getUserCoupon','Business\Index\Index@getUserCoupon');//用户所有优惠券
         Route::match(['get','post'],'orderInfo','Business\Index\Index@orderInfo');//订单
+        Route::match(['get','post'],'purchaseList','Business\Index\Index@purchaseList');//充值列表
+        Route::match(['get','post'],'purchase','Business\Index\Index@purchase');//充值
 
 
 

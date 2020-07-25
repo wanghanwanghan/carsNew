@@ -14,9 +14,11 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
+use App\Http\Models\purchaseOrder;
 use App\Http\Models\refundInfo;
 use App\Http\Models\users;
 use App\Http\Service\UploadImg;
+use Carbon\Carbon;
 use Geohash\GeoHash;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -802,6 +804,186 @@ class AdminController extends AdminBase
         $orderInfo->save();
 
         return response()->json($this->createReturn(200,[]));
+    }
+
+    //充值页面
+    public function getPurchaseList(Request $request)
+    {
+        $year=date('Y');
+        $month='';
+        $day='';
+
+        if (!empty($request->year)) $year=$request->year;
+        if (!empty($request->month)) $month=$request->month;
+        if (!empty($request->day)) $day=$request->day;
+
+        //当日充值次数=============================
+        $tmp=purchaseOrder::where([
+            'year'=>date('Y'),
+            'month'=>date('m'),
+            'day'=>date('d'),
+            'orderStatus'=>'支付成功'
+        ])->groupBy('hour')->select(DB::raw('hour,count(1) as num'))->get()->toArray();
+
+        $dayCount=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+        foreach ($tmp as $one)
+        {
+            $dayCount[$one['hour']]=$one['num'];
+        }
+
+        //累计充值次数=======================================================================================
+        //看看是年的还是月的还是日的
+        $tmp=purchaseOrder::where('year',$year)->where('orderStatus','支付成功');
+        $groupBy='month';
+        $totalCount=[0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+        if (!empty($month))
+        {
+            $tmp->where('month',$month);
+            $groupBy='day';
+            $totalCount=[];
+            for ($i=32;$i--;)
+            {
+                $totalCount[]=0;
+            }
+        }
+
+        if (!empty($day))
+        {
+            $tmp->where('day',$day);
+            $groupBy='hour';
+            $totalCount=[];
+            for ($i=22;$i--;)
+            {
+                $totalCount[]=0;
+            }
+        }
+
+        $tmp=$tmp->groupBy($groupBy)->select(DB::raw("{$groupBy},count(1) as num"))->get()->toArray();
+
+        foreach ($tmp as $one)
+        {
+            $totalCount[$one[$groupBy]]=$one['num'];
+        }
+
+        //当日充值金额=============================
+        $tmp=purchaseOrder::where([
+            'year'=>date('Y'),
+            'month'=>date('m'),
+            'day'=>date('d'),
+            'orderStatus'=>'支付成功'
+        ])->groupBy('hour')->select(DB::raw('hour,sum(purchaseMoney) as money'))->get()->toArray();
+
+        $dayMoney=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+        foreach ($tmp as $one)
+        {
+            $dayMoney[$one['hour']]=$one['money'];
+        }
+
+        //累计充值金额=======================================================================================
+        //看看是年的还是月的还是日的
+        $tmp=purchaseOrder::where('year',$year)->where('orderStatus','支付成功');
+        $groupBy='month';
+        $totalMoney=[0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+        if (!empty($month))
+        {
+            $tmp->where('month',$month);
+            $groupBy='day';
+            $totalMoney=[];
+            for ($i=32;$i--;)
+            {
+                $totalMoney[]=0;
+            }
+        }
+
+        if (!empty($day))
+        {
+            $tmp->where('day',$day);
+            $groupBy='hour';
+            $totalMoney=[];
+            for ($i=22;$i--;)
+            {
+                $totalMoney[]=0;
+            }
+        }
+
+        $tmp=$tmp->groupBy($groupBy)->select(DB::raw("{$groupBy},sum(purchaseMoney) as money"))->get()->toArray();
+
+        foreach ($tmp as $one)
+        {
+            $totalMoney[$one[$groupBy]]=$one['money'];
+        }
+
+        //充值金额折线图===========================
+        $yearChartsLine=[];//最近几年
+        $monthChartsLine=[];//最近几月
+        $dayChartsLine=[];//最近几日
+
+        $lineYear=$request->lineYear ?? 20;
+        $lineMonth=$request->lineMonth ?? 20;
+        $lineDay=$request->lineDay ?? 20;
+
+        //最近几年=======================================================================================
+        for ($i=$lineYear;$i--;)
+        {
+            $yearChartsLine[date('Y') - $i]=0;
+        }
+
+        $tmp=purchaseOrder::whereIn('year',array_keys($yearChartsLine))->where('orderStatus','支付成功')
+            ->groupBy('year')->select(DB::raw('year,sum(purchaseMoney) as money'))->get()->toArray();
+
+        foreach ($tmp as $one)
+        {
+            $yearChartsLine[$one['year']]=$one['money'];
+        }
+
+        //最近几月=======================================================================================
+        for ($i=$lineMonth;$i--;)
+        {
+            $monthChartsLine[Carbon::now()->subMonths($i)->format('Y-m')]=0;
+        }
+
+        foreach (array_keys($monthChartsLine) as $one)
+        {
+            $res=purchaseOrder::where('orderStatus','支付成功')
+                ->where('year',head(explode('-',$one)))
+                ->where('month',last(explode('-',$one)))
+                ->select(DB::raw('sum(purchaseMoney) as money'))
+                ->get()->toArray();
+
+            $monthChartsLine[$one]=(int)current(Arr::flatten($res));
+        }
+
+        //最近几天=======================================================================================
+        for ($i=$lineDay;$i--;)
+        {
+            $dayChartsLine[Carbon::now()->subDays($i)->format('Y-m-d')]=0;
+        }
+
+        foreach (array_keys($dayChartsLine) as $one)
+        {
+            $res=purchaseOrder::where('orderStatus','支付成功')
+                ->where('year',head(explode('-',$one)))
+                ->where('month',explode('-',$one)[1])
+                ->where('day',last(explode('-',$one)))
+                ->select(DB::raw('sum(purchaseMoney) as money'))
+                ->get()->toArray();
+
+            $dayChartsLine[$one]=(int)current(Arr::flatten($res));
+        }
+
+        return response()->json($this->createReturn(200,[
+            'dayCount'=>$dayCount,
+            'totalCount'=>$totalCount,
+            'dayMoney'=>$dayMoney,
+            'totalMoney'=>$totalMoney,
+            'yearChartsLine'=>$yearChartsLine,
+            'monthChartsLine'=>$monthChartsLine,
+            'daysChartsLine'=>$dayChartsLine,
+        ]));
     }
 
 

@@ -13,6 +13,7 @@ use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
+use App\Http\Models\purchaseOrder;
 use App\Http\Models\users;
 use App\Http\Service\MiniAppPay;
 use App\Http\Service\SendSms;
@@ -1024,6 +1025,47 @@ class Index extends BusinessBase
         }
 
         return response()->json($this->createReturn(200,$data));
+    }
+
+    //充值列表
+    public function purchaseList(Request $request)
+    {
+        $phone=$request->phone;
+
+        $res=Redis::hgetall('purchaseList');
+
+        return response()->json($this->createReturn(200,$res));
+    }
+
+    //充值
+    public function purchase(Request $request)
+    {
+        $phone=$request->phone;
+        $type=$request->type ?? 't1';
+        $jsCode=$request->jsCode ?? 123;
+
+        $money=Redis::hget('purchaseList',$type);
+
+        //创建订单
+        $orderId=control::getUuid(24).'purchase';
+        $body="{$type}_充值";
+
+        purchaseOrder::create([
+            'phone'=>$phone,
+            'orderId'=>$orderId,
+            'orderType'=>$type,
+            'orderStatus'=>'待支付',
+            'purchaseMoney'=>$money,
+            'unixTime'=>time(),
+            'year'=>date('Y'),
+            'month'=>date('m'),
+            'day'=>date('d'),
+            'hour'=>date('H'),
+        ]);
+
+        $res=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$money);
+
+        return response()->json($this->createReturn(200,$res));
     }
 
 

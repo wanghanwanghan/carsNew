@@ -2,7 +2,6 @@
 
 namespace App\Http\Service;
 
-use App\Http\Models\order;
 use wanghanwanghan\someUtils\traits\Singleton;
 use Yansongda\LaravelPay\Facades\Pay;
 
