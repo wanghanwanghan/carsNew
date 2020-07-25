@@ -764,7 +764,11 @@ class AdminController extends AdminBase
             $one['realPassword']=control::aesDecode($one['password'],$one['phone']);
 
             //累计充值
-            $one['purchaseMoney']=0;
+            $res=purchaseOrder::where('orderStatus','支付成功')->where('phone',$one['phone'])
+                ->select(DB::raw('sum(purchaseMoney) as money'))
+                ->get()->toArray();
+
+            $one['purchaseMoney']=(int)current(Arr::flatten($res));
         }
         unset($one);
 
