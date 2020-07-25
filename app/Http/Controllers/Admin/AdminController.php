@@ -975,7 +975,39 @@ class AdminController extends AdminBase
             $dayChartsLine[$one]=(int)current(Arr::flatten($res));
         }
 
+        $offset=$this->offset($request);
+
+        $orderBy=$request->orderBy ?? 'created_at,desc';
+        $orderBy=explode(',',$orderBy);
+
+        if (empty($request->cond))
+        {
+            $list=purchaseOrder::orderBy(head($orderBy),last($orderBy))->offset(head($offset))->limit(last($offset))
+                ->get([
+                    'id','phone','orderId','orderStatus','purchaseMoney','created_at'
+                ])->toArray();
+
+            $total=purchaseOrder::count();
+
+        }else
+        {
+            $cond=$request->cond;
+
+            $list=purchaseOrder::where(function ($query) use ($cond) {
+                $query->where('phone',$cond)->orWhere('orderId','like',"%{$cond}%");
+            })->orderBy(head($orderBy),last($orderBy))->offset(head($offset))->limit(last($offset))
+                ->get([
+                    'id','phone','orderId','orderStatus','purchaseMoney','created_at'
+                ])->toArray();
+
+            $total=purchaseOrder::where(function ($query) use ($cond) {
+                $query->where('phone',$cond)->orWhere('orderId','like',"%{$cond}%");
+            })->count();
+        }
+
         return response()->json($this->createReturn(200,[
+            'list'=>$list,
+            'total'=>$total,
             'dayCount'=>$dayCount,
             'totalCount'=>$totalCount,
             'dayMoney'=>$dayMoney,
