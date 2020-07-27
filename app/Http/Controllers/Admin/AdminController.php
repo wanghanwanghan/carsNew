@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
@@ -813,14 +814,6 @@ class AdminController extends AdminBase
     //充值页面
     public function getPurchaseList(Request $request)
     {
-        $year=date('Y');
-        $month='';
-        $day='';
-
-        if (!empty($request->year)) $year=$request->year;
-        if (!empty($request->month)) $month=$request->month;
-        if (!empty($request->day)) $day=$request->day;
-
         //当日充值次数=============================
         $tmp=purchaseOrder::where([
             'year'=>date('Y'),
@@ -838,38 +831,11 @@ class AdminController extends AdminBase
 
         //累计充值次数=======================================================================================
         //看看是年的还是月的还是日的
-        $tmp=purchaseOrder::where('year',$year)->where('orderStatus','支付成功');
-        $groupBy='month';
-        $totalCount=[0,0,0,0,0,0,0,0,0,0,0,0,0];
+        $tmp=purchaseOrder::where('orderStatus','支付成功');
 
-        if (!empty($month))
-        {
-            $tmp->where('month',$month);
-            $groupBy='day';
-            $totalCount=[];
-            for ($i=32;$i--;)
-            {
-                $totalCount[]=0;
-            }
-        }
+        $tmp=$tmp->select(DB::raw("orderStatus,count(1) as num"))->get()->toArray();
 
-        if (!empty($day))
-        {
-            $tmp->where('day',$day);
-            $groupBy='hour';
-            $totalCount=[];
-            for ($i=22;$i--;)
-            {
-                $totalCount[]=0;
-            }
-        }
-
-        $tmp=$tmp->groupBy($groupBy)->select(DB::raw("{$groupBy},count(1) as num"))->get()->toArray();
-
-        foreach ($tmp as $one)
-        {
-            $totalCount[$one[$groupBy]]=$one['num'];
-        }
+        $totalCount=current($tmp)['num'];
 
         //当日充值金额=============================
         $tmp=purchaseOrder::where([
@@ -888,38 +854,11 @@ class AdminController extends AdminBase
 
         //累计充值金额=======================================================================================
         //看看是年的还是月的还是日的
-        $tmp=purchaseOrder::where('year',$year)->where('orderStatus','支付成功');
-        $groupBy='month';
-        $totalMoney=[0,0,0,0,0,0,0,0,0,0,0,0,0];
+        $tmp=purchaseOrder::where('orderStatus','支付成功');
 
-        if (!empty($month))
-        {
-            $tmp->where('month',$month);
-            $groupBy='day';
-            $totalMoney=[];
-            for ($i=32;$i--;)
-            {
-                $totalMoney[]=0;
-            }
-        }
+        $tmp=$tmp->select(DB::raw("sum(purchaseMoney) as money"))->get()->toArray();
 
-        if (!empty($day))
-        {
-            $tmp->where('day',$day);
-            $groupBy='hour';
-            $totalMoney=[];
-            for ($i=22;$i--;)
-            {
-                $totalMoney[]=0;
-            }
-        }
-
-        $tmp=$tmp->groupBy($groupBy)->select(DB::raw("{$groupBy},sum(purchaseMoney) as money"))->get()->toArray();
-
-        foreach ($tmp as $one)
-        {
-            $totalMoney[$one[$groupBy]]=$one['money'];
-        }
+        $totalMoney=(int)current($tmp)['money'];
 
         //充值金额折线图===========================
         $yearChartsLine=[];//最近几年
@@ -1022,6 +961,99 @@ class AdminController extends AdminBase
         ]));
     }
 
+    //首页
+    public function index(Request $request)
+    {
+        $lineYear=$request->lineYear ?? 3;
+        $lineMonth=$request->lineMonth ?? 10;
+        $lineDay=$request->lineDay ?? 100;
+
+        //待确认等待======================================================
+        $readyToConfirm=order::where('orderStatus','待确认')->count();
+
+        //等审核认证======================================================
+        $readyToCheck=users::where(function ($query) {
+            $query->orWhere('isCarLicensePass','<>',99)->orWhere('isMotorLicensePass','<>',99)
+                ->orWhere('isIdCardPass','<>',99)->orWhere('idCardImg','<>',99)->orWhere('isPassportPass','<>',99);
+        })->count();
+
+        //今日订单========================================================
+        $start=Carbon::now()->startOfDay()->format('Y-m-d H:i:s');
+        $stop=Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
+        $todayOrder=order::whereBetween('created_at',[$start,$stop])->count();
+
+        //今日充值========================================================
+        $start=Carbon::now()->startOfDay()->format('Y-m-d H:i:s');
+        $stop=Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
+        $todayPurchase=purchaseOrder::whereBetween('created_at',[$start,$stop])->count();
+
+        //最近几年=======================================================================================
+        for ($i=$lineYear;$i--;)
+        {
+            $yearChartsLine[date('Y') - $i]=0;
+        }
+
+        $tmp=order::whereIn('year',array_keys($yearChartsLine))->whereNotIn('orderStatus',['待支付','已退单'])
+            ->groupBy('year')->select(DB::raw('year,count(1) as num'))->get()->toArray();
+
+        foreach ($tmp as $one)
+        {
+            $yearChartsLine[$one['year']]=$one['num'];
+        }
+
+        //最近几月=======================================================================================
+        for ($i=$lineMonth;$i--;)
+        {
+            $monthChartsLine[Carbon::now()->subMonths($i)->format('Y-m')]=0;
+        }
+
+        foreach (array_keys($monthChartsLine) as $one)
+        {
+            $res=order::whereNotIn('orderStatus',['待支付','已退单'])
+                ->where('year',head(explode('-',$one)))
+                ->where('month',last(explode('-',$one)))
+                ->count();
+
+            $monthChartsLine[$one]=(int)$res;
+        }
+
+        //最近几天=======================================================================================
+        for ($i=$lineDay;$i--;)
+        {
+            $dayChartsLine[Carbon::now()->subDays($i)->format('Y-m-d')]=0;
+        }
+
+        foreach (array_keys($dayChartsLine) as $one)
+        {
+            $res=purchaseOrder::whereNotIn('orderStatus',['待支付','已退单'])
+                ->where('year',head(explode('-',$one)))
+                ->where('month',explode('-',$one)[1])
+                ->where('day',last(explode('-',$one)))
+                ->count();
+
+            $dayChartsLine[$one]=(int)$res;
+        }
+
+        //pv uv只支持以天取
+        for ($i=$lineDay;$i--;)
+        {
+            $key=Carbon::now()->subDays($i)->format('Ymd');
+            $pv[control::insertSomething($key,[4,6])]=Redis::hget('pv',$key);
+            $uv[control::insertSomething($key,[4,6])]=Redis::hget('uv',$key);
+        }
+
+        return response()->json($this->createReturn(200,[
+            'readyToConfirm'=>$readyToConfirm,
+            'readyToCheck'=>$readyToCheck,
+            'todayOrder'=>$todayOrder,
+            'todayPurchase'=>$todayPurchase,
+            'yearChartsLine'=>$yearChartsLine,
+            'monthChartsLine'=>$monthChartsLine,
+            'dayChartsLine'=>$dayChartsLine,
+            'pv'=>$pv,
+            'uv'=>$uv
+        ]));
+    }
 
 
 

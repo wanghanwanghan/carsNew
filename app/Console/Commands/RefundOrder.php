@@ -25,8 +25,7 @@ class RefundOrder extends Command
     public function handle()
     {
         //确定对象
-        //$refundOrders=refundInfo::where('refundTime','<',time())->where('isFinish',0)->get()->toArray();
-        $refundOrders=[];
+        $refundOrders=refundInfo::where('refundTime','<',time())->where('isFinish',0)->get()->toArray();
 
         foreach ($refundOrders as $oneRefundOrder)
         {

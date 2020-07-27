@@ -769,7 +769,7 @@ class Index extends BusinessBase
             'payWay'=>'待选择', 'payment'=>$payment, 'startTime'=>$startTime, 'stopTime'=>$stopTime,
             'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
             'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
-            'NotifyInfo'=>''
+            'NotifyInfo'=>'','year'=>date('Y'),'month'=>date('m'),'day'=>date('d'),'hour'=>date('H')
         ];
 
         try
