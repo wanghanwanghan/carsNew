@@ -1071,7 +1071,7 @@ class AdminController extends AdminBase
         {
             $list=purchaseOrder::orderBy(head($orderBy),last($orderBy))->offset(head($offset))->limit(last($offset))
                 ->get([
-                    'id','phone','orderId','orderStatus','purchaseMoney','created_at'
+                    'id','phone','orderId','orderStatus','purchaseMoney','created_at','NotifyInfo'
                 ])->toArray();
 
             $total=purchaseOrder::count();
@@ -1084,13 +1084,22 @@ class AdminController extends AdminBase
                 $query->where('phone',$cond)->orWhere('orderId','like',"%{$cond}%");
             })->orderBy(head($orderBy),last($orderBy))->offset(head($offset))->limit(last($offset))
                 ->get([
-                    'id','phone','orderId','orderStatus','purchaseMoney','created_at'
+                    'id','phone','orderId','orderStatus','purchaseMoney','created_at','NotifyInfo'
                 ])->toArray();
 
             $total=purchaseOrder::where(function ($query) use ($cond) {
                 $query->where('phone',$cond)->orWhere('orderId','like',"%{$cond}%");
             })->count();
         }
+
+        //to一个交易单号
+        foreach ($list as &$one)
+        {
+            $notify=json_decode($one['NotifyInfo'],true);
+
+            $one['toOrderId']=$notify['transaction_id'] ?? null;
+        }
+        unset($one);
 
         return response()->json($this->createReturn(200,[
             'list'=>$list,
@@ -1182,8 +1191,8 @@ class AdminController extends AdminBase
         for ($i=$lineDay;$i--;)
         {
             $key=Carbon::now()->subDays($i)->format('Ymd');
-            $pv[control::insertSomething($key,[4,6])]=Redis::hget('pv',$key);
-            $uv[control::insertSomething($key,[4,6])]=Redis::hget('uv',$key);
+            $pv[control::insertSomething($key,[4,6])]=(int)Redis::hget('pv',$key);
+            $uv[control::insertSomething($key,[4,6])]=(int)Redis::hget('uv',$key);
         }
 
         return response()->json($this->createReturn(200,[
