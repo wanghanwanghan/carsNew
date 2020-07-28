@@ -81,8 +81,8 @@ class RefundOrder extends Command
 
         $res=MiniAppPay::getInstance()->refundOrder($orderInfo['orderId'],$refundInfo['refundId'],$body,$totalFee,$refMoney);
 
-        Redis::set("{$orderInfo['orderId']}_{$refundInfo['refundInfo']}",json_encode($res));
-        Redis::expire("{$orderInfo['orderId']}_{$refundInfo['refundInfo']}",86400);
+        Redis::set("{$orderInfo['orderId']}_{$refundInfo['refundId']}",json_encode($res));
+        Redis::expire("{$orderInfo['orderId']}_{$refundInfo['refundId']}",86400);
 
         return true;
     }
