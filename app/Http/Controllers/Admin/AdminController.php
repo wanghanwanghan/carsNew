@@ -807,12 +807,6 @@ class AdminController extends AdminBase
             'isFinish'=>0,
         ]);
 
-        if ($refundType==1)
-        {
-            $orderInfo->orderStatus='已退单';
-            $orderInfo->save();
-        }
-
         return response()->json($this->createReturn(200,[],'success'));
     }
 
