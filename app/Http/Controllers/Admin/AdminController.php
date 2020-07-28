@@ -791,7 +791,7 @@ class AdminController extends AdminBase
         $orderId=$request->orderId ?? '';
         $refundType=$request->refundType ?? 1;
         $refundPrice=$request->refundPrice ?? 0.01;
-        $day=$request->day ?? 1;
+        $day=$request->day ?? 0;
         $password=$request->password ?? '*#06#';
 
         $orderInfo=order::where('orderId',$orderId)->first();
