@@ -41,6 +41,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'setRemark/order','Admin\AdminController@setRemarkOrder');//修改订单的备注
     Route::match(['get','post'],'get/purchase','Admin\AdminController@getPurchaseList');//充值页面
     Route::match(['get','post'],'index','Admin\AdminController@index');//首页
+    Route::match(['get','post'],'edit/notifyPhone','Admin\AdminController@editNotifyPhone');//首页
 
 
 

@@ -781,6 +781,7 @@ class AdminController extends AdminBase
         $tmp['total']['自驾']=$total1;
         $tmp['total']['出行']=$total2;
         $tmp['total']['摩托']=$total3;
+        $tmp['notifyPhone']=Redis::hget('adminConfig','notifyPhone') ?? 13800138000;
 
         return response()->json($this->createReturn(200,$tmp,''));
     }
@@ -1215,6 +1216,15 @@ class AdminController extends AdminBase
         ]));
     }
 
+    //修改通知手机号
+    public function editNotifyPhone(Request $request)
+    {
+        $phone=$request->phone ?? 13800138000;
+
+        Redis::hset('adminConfig','notifyPhone',$phone);
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 
