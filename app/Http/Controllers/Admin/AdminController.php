@@ -606,7 +606,14 @@ class AdminController extends AdminBase
     //获取订单
     public function getOrder(Request $request)
     {
-        $orderType=$request->orderType ?? '自驾';
+        $orderType=$request->orderType;
+        if (empty($orderType))
+        {
+            $orderType=['自驾','出行','摩托'];
+        }else
+        {
+            $orderType=explode(',',$orderType);
+        }
         $orderStatus=$request->orderStatus;
         if (empty($orderStatus))
         {
@@ -622,7 +629,7 @@ class AdminController extends AdminBase
         $pageSize=$request->pageSize ?? 10;
 
         //当前查看的orderType
-        $res=order::where('orderType',$orderType);
+        $res=order::whereIn('orderType',$orderType);
 
         if (!empty($cond))
         {

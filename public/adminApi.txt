@@ -3,7 +3,7 @@
 地址:https://jikecardata.bobocar.cn/api/admin/get/order
 方法:get/post
 参数:
-     orderType = 自驾，有自驾，出行，摩托，三个值，传字符串吧，懒了
+     orderType = '自驾,出行,摩托'，有自驾，出行，摩托，三个值，传字符串，逗号分隔
      orderStatus = 待确认，不传就是全部状态的订单，传哪个状态就搜哪个状态的订单，传中文
      orderBy = 'created_at,desc'，传普通字符串，不要json，逗号分隔
      cond = 13800138000，传手机号或者订单号查询
