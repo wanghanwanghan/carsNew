@@ -641,9 +641,9 @@ class AdminController extends AdminBase
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
                 //总的数据条数
-                $total1=order::where('orderType','自驾')->where('account',$cond)->count();
-                $total2=order::where('orderType','出行')->where('account',$cond)->count();
-                $total3=order::where('orderType','摩托')->where('account',$cond)->count();
+                $total1=order::where('orderType','自驾')->where('orderStatus',$orderStatus)->where('account',$cond)->count();
+                $total2=order::where('orderType','出行')->where('orderStatus',$orderStatus)->where('account',$cond)->count();
+                $total3=order::where('orderType','摩托')->where('orderStatus',$orderStatus)->where('account',$cond)->count();
 
             }else
             {
@@ -653,9 +653,9 @@ class AdminController extends AdminBase
                     ->paginate($pageSize,['*'],'',$page)->toArray();
 
                 //总的数据条数
-                $total1=order::where('orderType','自驾')->where('orderId','like',"%{$cond}%")->count();
-                $total2=order::where('orderType','出行')->where('orderId','like',"%{$cond}%")->count();
-                $total3=order::where('orderType','摩托')->where('orderId','like',"%{$cond}%")->count();
+                $total1=order::where('orderType','自驾')->where('orderStatus',$orderStatus)->where('orderId','like',"%{$cond}%")->count();
+                $total2=order::where('orderType','出行')->where('orderStatus',$orderStatus)->where('orderId','like',"%{$cond}%")->count();
+                $total3=order::where('orderType','摩托')->where('orderStatus',$orderStatus)->where('orderId','like',"%{$cond}%")->count();
             }
 
         }else
@@ -665,9 +665,9 @@ class AdminController extends AdminBase
                 ->paginate($pageSize,['*'],'',$page)->toArray();
 
             //总的数据条数
-            $total1=order::where('orderType','自驾')->count();
-            $total2=order::where('orderType','出行')->count();
-            $total3=order::where('orderType','摩托')->count();
+            $total1=order::where('orderType','自驾')->where('orderStatus',$orderStatus)->count();
+            $total2=order::where('orderType','出行')->where('orderStatus',$orderStatus)->count();
+            $total3=order::where('orderType','摩托')->where('orderStatus',$orderStatus)->count();
         }
 
         $res=$res['data'];
