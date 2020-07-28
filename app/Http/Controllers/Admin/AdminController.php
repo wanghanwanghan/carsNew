@@ -403,7 +403,7 @@ class AdminController extends AdminBase
         $carBelongId=$request->carBelongId;
 
         //删除车行
-        carBelong::where('carBelongId',$carBelongId)->delete();
+        carBelong::where('id',$carBelongId)->delete();
 
         //车行里相关的车全删了
         carModelCarBelong::where('carBelongId',$carBelongId)->delete();
