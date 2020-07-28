@@ -10,6 +10,7 @@ use App\Http\Models\carInfo;
 use App\Http\Models\carLicenseType;
 use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
+use App\Http\Models\carModelLabel;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
@@ -174,6 +175,76 @@ class AdminController extends AdminBase
         }
     }
 
+    //编辑车
+    public function editCar(Request $request)
+    {
+        $carModelId=$request->carModelId;
+        $carImg=$request->carImg;
+        $carType=$request->carType;
+        $carBrandId=$request->carBrandId;
+        $carModel=$request->carModel;
+        $dayPrice=$request->dayPrice;
+        $dayDiscount=$request->dayDiscount;
+        $goPrice=$request->goPrice;
+        $goDiscount=$request->goDiscount;
+        $damagePrice=$request->damagePrice;
+        $forfeitPrice=$request->forfeitPrice;
+        $level=$request->level;
+        $kilPrice=$request->kilPrice;
+        $carBelongArr=json_decode($request->carBelongArr,true);
+        $carDesc=$request->carDesc;
+
+        //搜索车型
+        $carInfo=carModel::find($carModelId);
+
+        $carInfo->carType=$carType;
+        $carInfo->carImg=$carImg;
+        $carInfo->carBrandId=$carBrandId;
+        $carInfo->carModel=$carModel;
+        $carInfo->dayPrice=$dayPrice;
+        $carInfo->dayDiscount=$dayDiscount;
+        $carInfo->goPrice=$goPrice;
+        $carInfo->goDiscount=$goDiscount;
+        $carInfo->damagePrice=$damagePrice;
+        $carInfo->forfeitPrice=$forfeitPrice;
+        $carInfo->level=$level;
+        $carInfo->kilPrice=$kilPrice;
+        $carInfo->carDesc=$carDesc;
+
+        $carInfo->save();
+
+        foreach ($carBelongArr as &$one)
+        {
+            $one['carModelId']=$carModelId;
+        }
+        unset($one);
+
+        DB::table('carModelCarBelong')->where('carModelId',$carModelId)->delete();
+        DB::table('carModelCarBelong')->insert($carBelongArr);
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除车
+    public function deleteCar(Request $request)
+    {
+        $carModelId=$request->carModelId;
+
+        //删除车型
+        carModel::where('id',$carModelId)->delete();
+
+        //删除和车行的关联表数据
+        carModelCarBelong::where('carModelId',$carModelId)->delete();
+
+        //删除标签表关联数据
+        carModelLabel::where('carModelId',$carModelId)->delete();
+
+        //删除订单表
+        order::where('carModelId',$carModelId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
     //创建优惠券
     public function createCoupon(Request $request)
     {
@@ -293,6 +364,53 @@ class AdminController extends AdminBase
         }
     }
 
+    //编辑车行
+    public function editCarBelong(Request $request)
+    {
+        $carBelongId=$request->carBelongId;
+        $name=$request->name;
+        $lng=$request->lng;
+        $lat=$request->lat;
+        $geo=(new GeoHash())->encode($lat,$lng,12);
+        $cityId=$request->cityId;
+        $address=$request->address;
+        $tel=$request->tel;
+        $phone=$request->phone;
+        $open=$request->open;
+        $close=$request->close;
+
+        $carBelongInfo=carBelong::find($carBelongId);
+
+        $carBelongInfo->name=$name;
+        $carBelongInfo->lng=$lng;
+        $carBelongInfo->lat=$lat;
+        $carBelongInfo->geo=$geo;
+        $carBelongInfo->cityId=$cityId;
+        $carBelongInfo->address=$address;
+        $carBelongInfo->tel=$tel;
+        $carBelongInfo->phone=$phone;
+        $carBelongInfo->open=$open;
+        $carBelongInfo->close=$close;
+
+        $carBelongInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除车行
+    public function deleteCarBelong(Request $request)
+    {
+        $carBelongId=$request->carBelongId;
+
+        //删除车行
+        carBelong::where('carBelongId',$carBelongId)->delete();
+
+        //车行里相关的车全删了
+        carModelCarBelong::where('carBelongId',$carBelongId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
     //创建车辆品牌
     public function createCarBrand(Request $request)
     {
@@ -334,6 +452,44 @@ class AdminController extends AdminBase
 
             return response()->json($this->createReturn($code));
         }
+    }
+
+    //编辑车辆品牌
+    public function editCarBrand(Request $request)
+    {
+        $carBrandId=$request->carBrandId;
+        $carBrand=$request->carBrand;
+
+        $model=carBrand::find($carBrandId);
+
+        $model->carBrand=$carBrand;
+
+        $model->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除车辆品牌
+    public function deleteCarBrand(Request $request)
+    {
+        $carBrandId=$request->carBrandId;
+
+        //删除品牌
+        carBrand::where('id',$carBrandId)->delete();
+
+        //得到要删除的车的id
+        $carModelId=carModel::where('carBrandId',$carBrandId)->get(['id'])->toArray();
+        $carModelId=Arr::flatten($carModelId);
+
+        //删除品牌里的车
+        carModel::where('carBrandId',$carBrandId)->delete();
+
+        //删除与车关联的表中数据
+        carModelCarBelong::whereIn('carModelId',$carModelId)->delete();
+        carModelLabel::whereIn('carModelId',$carModelId)->delete();
+        order::whereIn('carModelId',$carModelId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
     }
 
     //创建banner
@@ -815,19 +971,12 @@ class AdminController extends AdminBase
     public function getPurchaseList(Request $request)
     {
         //当日充值次数=============================
-        $tmp=purchaseOrder::where([
+        $dayCount=purchaseOrder::where([
             'year'=>date('Y'),
             'month'=>date('m'),
             'day'=>date('d'),
             'orderStatus'=>'支付成功'
-        ])->groupBy('hour')->select(DB::raw('hour,count(1) as num'))->get()->toArray();
-
-        $dayCount=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-
-        foreach ($tmp as $one)
-        {
-            $dayCount[$one['hour']]=$one['num'];
-        }
+        ])->count();
 
         //累计充值次数=======================================================================================
         //看看是年的还是月的还是日的
@@ -838,19 +987,14 @@ class AdminController extends AdminBase
         $totalCount=current($tmp)['num'];
 
         //当日充值金额=============================
-        $tmp=purchaseOrder::where([
+        $dayMoney=purchaseOrder::where([
             'year'=>date('Y'),
             'month'=>date('m'),
             'day'=>date('d'),
             'orderStatus'=>'支付成功'
-        ])->groupBy('hour')->select(DB::raw('hour,sum(purchaseMoney) as money'))->get()->toArray();
+        ])->select(DB::raw('sum(purchaseMoney) as money'))->get()->toArray();
 
-        $dayMoney=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-
-        foreach ($tmp as $one)
-        {
-            $dayMoney[$one['hour']]=$one['money'];
-        }
+        $dayMoney=(int)current(Arr::flatten($dayMoney));
 
         //累计充值金额=======================================================================================
         //看看是年的还是月的还是日的
