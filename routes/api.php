@@ -8,8 +8,6 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'login','Admin\AdminController@login');//登录
     Route::match(['get','post'],'uploadImg','Admin\AdminController@uploadImg');//上传图片
     Route::match(['get','post'],'paginate','Admin\AdminController@paginate');//公共分页
-
-
     Route::match(['get','post'],'create/car','Admin\AdminController@createCar');//创建车辆
     Route::match(['get','post'],'edit/car','Admin\AdminController@editCar');//编辑车辆
     Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆
@@ -19,20 +17,12 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'create/carBrand','Admin\AdminController@createCarBrand');//创建品牌
     Route::match(['get','post'],'edit/carBrand','Admin\AdminController@editCarBrand');//修改品牌
     Route::match(['get','post'],'delete/carBrand','Admin\AdminController@deleteCarBrand');//删除品牌
-
-
-
-
-
-
-
     Route::match(['get','post'],'create/coupon','Admin\AdminController@createCoupon');//创建优惠券
     Route::match(['get','post'],'create/banner','Admin\AdminController@createBanner');//创建banner
     Route::match(['get','post'],'create/bannerAction','Admin\AdminController@createBannerAction');//创建banner的活动页
-
     Route::match(['get','post'],'get/order','Admin\AdminController@getOrder');//获取订单
     Route::match(['get','post'],'refund/order','Admin\AdminController@refundOrder');//订单退款
-    Route::match(['get','post'],'setStatus/order','Admin\AdminController@setOrderStatus');//修改订单状态为已完成
+    Route::match(['get','post'],'setStatus/order','Admin\AdminController@setOrderStatus');//修改订单状态
     Route::match(['get','post'],'setForfeitPrice/order','Admin\AdminController@setForfeitPriceOrder');
     Route::match(['get','post'],'get/license','Admin\AdminController@getLicense');//获取证件
     Route::match(['get','post'],'setStatus/license','Admin\AdminController@setLicenseStatus');//修改证件审核状态
@@ -42,9 +32,15 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'get/purchase','Admin\AdminController@getPurchaseList');//充值页面
     Route::match(['get','post'],'index','Admin\AdminController@index');//首页
     Route::match(['get','post'],'edit/notifyPhone','Admin\AdminController@editNotifyPhone');//首页
+    Route::match(['get','post'],'getOrderNumByStatus','Admin\AdminController@getOrderNumByStatus');
+    Route::match(['get','post'],'setRentPersonInfo/order','Admin\AdminController@setRentPersonInfo');//
 
 
 
+
+
+
+    Route::match(['get','post'],'upload/file','Admin\AdminBase@uploadFile');//上传需求文件
 });
 
 //business

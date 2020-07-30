@@ -794,8 +794,14 @@ class AdminController extends AdminBase
         $refundPrice=$request->refundPrice ?? 0.01;
         $day=$request->day ?? 0;
         $password=$request->password ?? '*#06#';
+        $remark=$request->remark;
 
         $orderInfo=order::where('orderId',$orderId)->first();
+
+        if (!empty($remark))
+        {
+            $orderInfo->remark=$remark;
+        }
 
         refundInfo::create([
             'phone'=>$orderInfo->account,
@@ -808,17 +814,20 @@ class AdminController extends AdminBase
             'isFinish'=>0,
         ]);
 
+        $orderInfo->save();
+
         return response()->json($this->createReturn(200,[],'success'));
     }
 
-    //设置订单为已完成状态
+    //setOrderStatus
     public function setOrderStatus(Request $request)
     {
         $orderId=$request->orderId ?? 1;
+        $orderStatus=$request->orderStatus ?? '已完成';
 
         $orderInfo=order::where('orderId',$orderId)->first();
 
-        $orderInfo->orderStatus='已完成';
+        $orderInfo->orderStatus=$orderStatus;
 
         $orderInfo->save();
 
@@ -1226,7 +1235,32 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //getOrderNumByStatus
+    public function getOrderNumByStatus(Request $request)
+    {
+        $orderStatus=$request->orderStatus ?? '待支付';
 
+        $count=order::where('orderStatus',$orderStatus)->count();
+
+        return response()->json($this->createReturn(200,['num'=>$count]));
+    }
+
+    //setRentPersonInfo
+    public function setRentPersonInfo(Request $request)
+    {
+        $orderId=$request->orderId;
+        $name=$request->rentPersonName ?? '飞';
+        $phone=$request->rentPersonPhone ?? '13800138000';
+
+        $info=order::where('orderId',$orderId)->first();
+
+        $info->rentPersonName=$name;
+        $info->rentPersonPhone=$phone;
+
+        $info->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 
