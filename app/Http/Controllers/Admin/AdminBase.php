@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\OrderExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -25,5 +26,10 @@ class AdminBase extends Controller
         ];
 
         return Arr::random($res);
+    }
+
+    public function excelTest(Request $request, OrderExport $orderExport)
+    {
+        return $orderExport->withinDays(20);
     }
 }
