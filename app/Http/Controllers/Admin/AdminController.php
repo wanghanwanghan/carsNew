@@ -774,6 +774,13 @@ class AdminController extends AdminBase
 
             $one['forfeitStatus']['status']=$status;
             $one['forfeitStatus']['day']=$day;
+
+            //取车时间
+            $test=$one['takeTime'];
+            $h=$test/60/60;
+            $m=$test - ((int)$h * 60 * 60);
+            $m=$m/60;
+            $one['takeTime']=str_pad((int)$h,2,'0',STR_PAD_LEFT).':'.str_pad((int)$m,2,'0',STR_PAD_LEFT);
         }
         unset($one);
 
@@ -826,7 +833,14 @@ class AdminController extends AdminBase
     {
         $orderId=$request->orderId ?? 1;
         $orderStatus=$request->orderStatus ?? '已完成';
-        $takeTime=$request->takeTime ?? 0;
+        $takeTime=$request->takeTime ?? '00,00';
+
+        $time=explode(',',$takeTime);
+        $h=(int)head($time);
+        $m=(int)last($time);
+
+        $h=$h * 60 * 60;
+        $m=$m * 60;
 
         $orderInfo=order::where('orderId',$orderId)->first();
 
@@ -835,7 +849,7 @@ class AdminController extends AdminBase
         switch ($orderStatus)
         {
             case '已确认':
-                $orderInfo->takeTime=$takeTime;
+                $orderInfo->takeTime=$h + $m;
                 break;
         }
 
