@@ -67,43 +67,25 @@ class Swoole extends Command
         $this->ws->start();
     }
 
-    /**
-     * 建立连接
-     * @param $ws
-     * @param $request
-     */
     public function open($ws, $request)
     {
-        var_dump($request->fd . '连接成功');
+        var_dump($request->fd, $request->get, $request->server);
+        $ws->push($request->fd, "open event");
     }
 
-    /**
-     * 接收消息
-     * @param $ws
-     * @param $frame
-     */
     public function message($ws, $frame)
     {
-        var_dump('发送成功');
+        var_dump("Message: {$frame->data}\n");
+        $ws->push($frame->fd, "message event : {$frame->data}");
     }
 
-    /**
-     * 接收请求
-     * @param $request
-     * @param $response
-     */
     public function request($request, $response)
     {
 
     }
 
-    /**
-     * 关闭连接
-     * @param $ws
-     * @param $fd
-     */
     public function close($ws, $fd)
     {
-
+        var_dump("close event : {$fd} is closed\n");
     }
 }
