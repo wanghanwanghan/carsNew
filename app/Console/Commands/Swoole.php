@@ -9,8 +9,6 @@ class Swoole extends Command
 {
     public $ws;
 
-    public $fdInRedis=null;
-
     protected $signature = 'swoole {action?}';
 
     protected $description = 'swoole';
@@ -24,8 +22,7 @@ class Swoole extends Command
     {
         $action = $this->argument('action');
 
-        switch ($action)
-        {
+        switch ($action) {
             case 'restart':
                 $this->info('swoole server restart');
                 break;
@@ -44,16 +41,16 @@ class Swoole extends Command
     public function start()
     {
         //创建websocket服务器对象，监听0.0.0.0:9501端口
-        $this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
+        //$this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
 
         //开启ssl模式
-        //$this->ws = new \swoole_websocket_server("0.0.0.0", 9501,SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
+        $this->ws = new \Swoole\WebSocket\Server("0.0.0.0", 9501,SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
 
         //配置ssl模式
-        //$this->ws->set([
-        //'ssl_key_file' => storage_path('cert/apiclient_key.pem'),
-        //'ssl_cert_file' => storage_path('cert/apiclient_cert.pem'),
-        //]);
+        $this->ws->set([
+        'ssl_key_file' => storage_path('cert/apiclient_key.pem'),
+        'ssl_cert_file' => storage_path('cert/apiclient_cert.pem'),
+        ]);
 
         //监听WebSocket连接打开事件
         $this->ws->on('open', [$this, 'open']);
@@ -74,9 +71,7 @@ class Swoole extends Command
     {
         $ws->push($request->fd, 'socket started , hello kangfei');
 
-        Redis::sadd('orderSocketFd',$request->fd);
-
-        var_dump(Redis::smembers('orderSocketFd'));
+        Redis::sadd('orderSocketFd', $request->fd);
     }
 
     public function message($ws, $frame)
@@ -91,6 +86,6 @@ class Swoole extends Command
 
     public function close($ws, $fd)
     {
-        Redis::srem('orderSocketFd',$fd);
+        Redis::srem('orderSocketFd', $fd);
     }
 }
