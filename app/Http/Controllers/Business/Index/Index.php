@@ -541,6 +541,7 @@ class Index extends BusinessBase
         $phone=$request->phone;
         $carModelId=$request->carModelId;
         $rentDays=$request->rentDays;
+        $orderType=$request->orderType ?? '自驾';
 
         //找出这辆车需要花费多少钱
         $carInfo=carModel::find($carModelId);
@@ -575,7 +576,7 @@ class Index extends BusinessBase
         ];
 
         //找出哪些优惠券可用
-        $couponInfo=coupon::where('phone',$phone)->where('couponType','自驾')->where('isUse',0)->get()->toArray();
+        $couponInfo=coupon::where('phone',$phone)->where('couponType',$orderType)->where('isUse',0)->get()->toArray();
 
         $available=$disabled=[];
 
@@ -676,7 +677,7 @@ class Index extends BusinessBase
         $startTime=$request->startTime;
         $stopTime =$request->stopTime;
         $carModelId=$request->carModelId;
-        $carBelongId=$request->carBelongId;
+        $carBelongId=(int)$request->carBelongId;
         $rentPersonName=$request->rentPersonName;
         $rentPersonPhone=$request->rentPersonPhone;
         $couponId=(int)$request->couponId;
