@@ -703,23 +703,30 @@ class Index extends BusinessBase
                 $payMoney=$carInfo->dayPrice - ($carInfo->dayPrice * $carInfo->dayDiscount * 0.01);
                 $payMoney=$payMoney * $rentDays;
                 $orderType='自驾';
+                //车损
+                $damagePrice=$carInfo->damagePrice;
+                //违章
+                $forfeitPrice=$carInfo->forfeitPrice;
                 break;
             case '2':
                 //出行
                 $payMoney=$carInfo->goPrice - ($carInfo->goPrice * $carInfo->goDiscount * 0.01);
                 $orderType='出行';
+                //车损
+                $damagePrice=0;
+                //违章
+                $forfeitPrice=0;
                 break;
             case '3':
                 //摩托
                 $orderType='摩托';
+                //车损
+                $damagePrice=$carInfo->damagePrice;
+                //违章
+                $forfeitPrice=$carInfo->forfeitPrice;
                 break;
             default:
         }
-
-        //车损
-        $damagePrice=$carInfo->damagePrice;
-        //违章
-        $forfeitPrice=$carInfo->forfeitPrice;
 
         //如果有优惠券
         if (!empty($couponId))
@@ -852,14 +859,21 @@ class Index extends BusinessBase
 
         $payment=$orderInfo->payment;
 
-        if ($payment==='全款')
+        //自驾价格
+        if ($payment==='全款' && $orderInfo->orderType==='自驾')
         {
             $payMoney=$orderInfo->orderPrice + $orderInfo->damagePrice + $orderInfo->forfeitPrice;
         }
 
-        if ($payment==='违章押金')
+        if ($payment==='违章押金' && $orderInfo->orderType==='自驾')
         {
             $payMoney=$orderInfo->forfeitPrice;
+        }
+
+        //出行价格
+        if ($payment==='全款' && $orderInfo->orderType==='出行')
+        {
+            $payMoney=$orderInfo->orderPrice;
         }
 
         if ($payWay===1)
