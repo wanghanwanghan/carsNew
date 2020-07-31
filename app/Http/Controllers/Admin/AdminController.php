@@ -834,6 +834,7 @@ class AdminController extends AdminBase
         $orderId=$request->orderId ?? 1;
         $orderStatus=$request->orderStatus ?? '已完成';
         $takeTime=$request->takeTime ?? '00,00';
+        $remark=$request->remark ?? '';
 
         $time=explode(',',$takeTime);
         $h=(int)head($time);
@@ -852,6 +853,8 @@ class AdminController extends AdminBase
                 $orderInfo->takeTime=$h + $m;
                 break;
         }
+
+        if ($remark) $orderInfo->remark=$remark;
 
         $orderInfo->save();
 
