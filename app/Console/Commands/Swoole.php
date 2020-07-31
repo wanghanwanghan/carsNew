@@ -76,7 +76,13 @@ class Swoole extends Command
     public function message($ws, $frame)
     {
         var_dump("Message: {$frame->data}\n");
-        $ws->push($frame->fd, "message event : {$frame->data}");
+
+        foreach ($ws->connections as $fd)
+        {
+            var_dump('客户端 : '.$fd);
+        }
+
+        $ws->push($frame->fd, "message event : ".$ws->server);
     }
 
     public function request($request, $response)
