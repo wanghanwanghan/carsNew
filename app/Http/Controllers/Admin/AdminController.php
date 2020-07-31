@@ -338,8 +338,8 @@ class AdminController extends AdminBase
             //要插入数据了
             $data=[
                 'name'=>$request->name ?? '我是车行',//名称
-                'lng'=>$lng,//纬度
-                'lat'=>$lat,//经度
+                'lng'=>$lng,//经度
+                'lat'=>$lat,//纬度
                 'geo'=>$geo,//geo
                 'address'=>$request->address ?? '北京市海淀区花园路13号汉太华',//地址
                 'tel'=>$request->tel ?? '12345678',//座机

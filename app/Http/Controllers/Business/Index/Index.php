@@ -675,7 +675,7 @@ class Index extends BusinessBase
     {
         $phone=$request->phone;
         $startTime=$request->startTime;
-        $stopTime =$request->stopTime;
+        $stopTime =$request->stopTime ?? 9999999999;
         $carModelId=$request->carModelId;
         $carBelongId=(int)$request->carBelongId;
         $rentPersonName=$request->rentPersonName;
@@ -712,6 +712,18 @@ class Index extends BusinessBase
                 //出行
                 $payMoney=$carInfo->goPrice - ($carInfo->goPrice * $carInfo->goDiscount * 0.01);
                 $orderType='出行';
+
+                //算两点间距离乘以每公里价格
+                //$lat纬度 $lng经度
+                $start=explode('_',$start);
+                $destination=explode('_',$destination);
+                $key=control::getUuid();
+                Redis::geoadd($key,head($start),last($start),'start');
+                Redis::geoadd($key,head($destination),last($destination),'destination');
+                $km=Redis::geodist($key,'start','destination','km');
+                $payMoney=$carInfo->kilPrice * $km + $payMoney;
+                Redis::expire($key,5);
+
                 //车损
                 $damagePrice=0;
                 //违章
