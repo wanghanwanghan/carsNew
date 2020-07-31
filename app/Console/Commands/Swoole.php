@@ -44,7 +44,7 @@ class Swoole extends Command
         //$this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
 
         //开启ssl模式
-        $this->ws = new \Swoole\WebSocket\Server("0.0.0.0", 9501,SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
+        $this->ws = new \Swoole\WebSocket\Server("0.0.0.0", 9501,\SWOOLE_PROCESS, \SWOOLE_SOCK_TCP | \SWOOLE_SSL);
 
         //配置ssl模式
         $this->ws->set([
