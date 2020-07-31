@@ -3,10 +3,13 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
 
 class Swoole extends Command
 {
     public $ws;
+
+    public $fdInRedis=null;
 
     protected $signature = 'swoole {action?}';
 
@@ -69,13 +72,16 @@ class Swoole extends Command
 
     public function open($ws, $request)
     {
-        $ws->push($request->fd, 'hello');
+        $ws->push($request->fd, 'socket started , hello kangfei');
+
+        Redis::sadd('orderSocketFd',$request->fd);
+
+        var_dump(Redis::scard('orderSocketFd'));
     }
 
     public function message($ws, $frame)
     {
-        var_dump($ws);
-        //$ws->push($frame->fd, "message event : ".$ws->server);
+
     }
 
     public function request($request, $response)
@@ -85,6 +91,6 @@ class Swoole extends Command
 
     public function close($ws, $fd)
     {
-        var_dump("close event : {$fd} is closed\n");
+        Redis::srem('orderSocketFd',$fd);
     }
 }
