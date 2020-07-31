@@ -792,6 +792,7 @@ class AdminController extends AdminBase
         $orderId=$request->orderId ?? '';
         $refundType=$request->refundType ?? 1;
         $refundPrice=$request->refundPrice ?? 0.01;
+        $refundPercent=$request->refundPercent ?? 100;
         $day=$request->day ?? 0;
         $password=$request->password ?? '*#06#';
         $remark=$request->remark;
@@ -808,6 +809,7 @@ class AdminController extends AdminBase
             'orderId'=>$orderInfo->orderId,
             'refundId'=>control::getUuid(16),
             'refundType'=>$refundType,
+            'refundPercent'=>$refundPercent,
             'refundPrice'=>$refundPrice,
             'day'=>$day,
             'refundTime'=>time() + 86400 * $day,
@@ -824,10 +826,18 @@ class AdminController extends AdminBase
     {
         $orderId=$request->orderId ?? 1;
         $orderStatus=$request->orderStatus ?? '已完成';
+        $takeTime=$request->takeTime ?? 0;
 
         $orderInfo=order::where('orderId',$orderId)->first();
 
         $orderInfo->orderStatus=$orderStatus;
+
+        switch ($orderStatus)
+        {
+            case '已确认':
+                $orderInfo->takeTime=$takeTime;
+                break;
+        }
 
         $orderInfo->save();
 

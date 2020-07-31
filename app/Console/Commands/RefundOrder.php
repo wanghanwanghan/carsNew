@@ -108,7 +108,8 @@ class RefundOrder extends Command
 
         $forfeit=$orderInfo['forfeitPrice'] - $forfeitRefund;
 
-        $refMoney=$damage + $forfeit + $orderInfo['orderPrice'];
+        //乘以退款百分比
+        $refMoney=($damage + $forfeit + $orderInfo['orderPrice']) * ($orderInfo['refundPercent'] / 100);
 
         //根据payWay调用退款
         $payWay==='钱包' ? $this->wallet($orderInfo,$refMoney) : $this->wx($orderInfo,$refundInfo,$refMoney);
