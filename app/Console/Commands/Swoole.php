@@ -41,7 +41,7 @@ class Swoole extends Command
     public function start()
     {
         //创建websocket服务器对象，监听0.0.0.0:9501端口
-        $this->ws = new Swoole\WebSocket\Server('0.0.0.0', 9501);
+        $this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
 
         //开启ssl模式
         //$this->ws = new \swoole_websocket_server("0.0.0.0", 9501,SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
