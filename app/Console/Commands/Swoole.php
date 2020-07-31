@@ -76,7 +76,7 @@ class Swoole extends Command
 
         Redis::sadd('orderSocketFd',$request->fd);
 
-        var_dump(Redis::scard('orderSocketFd'));
+        var_dump(Redis::smembers('orderSocketFd'));
     }
 
     public function message($ws, $frame)
