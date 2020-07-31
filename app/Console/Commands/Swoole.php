@@ -69,20 +69,13 @@ class Swoole extends Command
 
     public function open($ws, $request)
     {
-        var_dump($request->fd, $request->get, $request->server);
-        $ws->push($request->fd, "open event");
+        $ws->push($request->fd, 'hello');
     }
 
     public function message($ws, $frame)
     {
-        var_dump("Message: {$frame->data}\n");
-
-        foreach ($ws->connections as $fd)
-        {
-            var_dump('客户端 : '.$fd);
-        }
-
-        $ws->push($frame->fd, "message event : ".$ws->server);
+        var_dump($ws);
+        //$ws->push($frame->fd, "message event : ".$ws->server);
     }
 
     public function request($request, $response)
