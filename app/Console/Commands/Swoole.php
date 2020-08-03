@@ -42,16 +42,16 @@ class Swoole extends Command
     public function start()
     {
         //创建websocket服务器对象，监听0.0.0.0:9501端口
-        //$this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
+        $this->ws = new \Swoole\WebSocket\Server('0.0.0.0', 9501);
 
         //开启ssl模式
-        $this->ws = new \Swoole\WebSocket\Server("0.0.0.0", 9501,\SWOOLE_PROCESS, \SWOOLE_SOCK_TCP | \SWOOLE_SSL);
+        //$this->ws = new \Swoole\WebSocket\Server("0.0.0.0", 9501,\SWOOLE_PROCESS, \SWOOLE_SOCK_TCP | \SWOOLE_SSL);
 
         //配置ssl模式
-        $this->ws->set([
-        'ssl_key_file' => storage_path('cert/apiclient_key.pem'),
-        'ssl_cert_file' => storage_path('cert/apiclient_cert.pem'),
-        ]);
+        //$this->ws->set([
+        //'ssl_key_file' => storage_path('cert/apiclient_key.pem'),
+        //'ssl_cert_file' => storage_path('cert/apiclient_cert.pem'),
+        //]);
 
         //监听WebSocket连接打开事件
         $this->ws->on('open', [$this, 'open']);
