@@ -70,7 +70,9 @@ class Swoole extends Command
 
     public function open($ws, $request)
     {
-        $ws->push($request->fd, 'socket started , hello kangfei');
+        $num=order::where('orderStatus','待支付')->count();
+
+        $ws->push($request->fd, $num);
     }
 
     public function message($ws, $frame)
