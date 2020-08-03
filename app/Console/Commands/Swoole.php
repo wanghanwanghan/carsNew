@@ -85,7 +85,7 @@ class Swoole extends Command
             if ($this->ws->isEstablished($fd))
             {
                 //$this->ws->push($fd,$request->get['message']);
-                $this->ws->push($fd,Carbon::now()->format('Y-m-d H:i:s'));
+                $this->ws->push($fd,$request->get('orderInfo'));
             }
         }
     }

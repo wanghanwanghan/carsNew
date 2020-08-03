@@ -384,7 +384,7 @@ class Index extends BusinessBase
         $res['total']=$carInfo['total'];
 
 
-        dd($this->curl(['wanghan'=>'duanran']));
+        dd($this->curl(['orderInfo'=>json_encode(['w'=>123,'duan'=>321])]));
 
 
         return $res;
