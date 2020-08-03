@@ -20,6 +20,7 @@ class BusinessBase extends Controller
     private function orderWay($orderWay='微信小程序')
     {
         $arr=[
+            '未知'=>'0',
             '微信小程序'=>'1',
         ];
 
