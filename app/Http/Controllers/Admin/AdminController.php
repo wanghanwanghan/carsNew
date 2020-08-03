@@ -257,11 +257,9 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $couponList=DB::table('coupon');
-
             $tmp=[];
-            $tmp['list']=$couponList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$couponList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=DB::table('coupon')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('coupon')->count();
 
             $res=[
                 'couponType'=>$couponType,
@@ -310,16 +308,14 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $carBelongList=DB::table('carBelong');
-
             $china_area=chinaArea::all()->toArray();
             $tmp=[];
             control::traverseMenu($china_area,$tmp);
             $china_area=$tmp;
 
             $tmp=[];
-            $tmp['list']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$carBelongList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=DB::table('carBelong')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('carBelong')->count();
 
             $res=[
                 'china_area'=>$china_area,
@@ -420,11 +416,9 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $carBrandList=DB::table('carBrand');
-
             $tmp=[];
-            $tmp['list']=$carBrandList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$carBrandList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=DB::table('carBrand')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('carBrand')->count();
 
             $res=[
                 'carBrandList'=>$tmp
@@ -501,11 +495,9 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $bannerList=DB::table('banner');
-
             $tmp=[];
-            $tmp['list']=$bannerList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$bannerList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=DB::table('banner')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('banner')->count();
 
             $res=[
                 'bannerList'=>$tmp
@@ -518,11 +510,11 @@ class AdminController extends AdminBase
             //要插入数据了
             $data=[
                 'name'=>$request->name ?? Str::random(),//活动名称
-                'image'=>$request->image ?? Str::random(),//图片地址
+                'image'=>$request->image ?? '',//图片地址
                 'isShow'=>$request->isShow ?? 1,//是否显示
                 'level'=>$request->level ?? mt_rand(1,100),//权重
                 'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
-                'href'=>$request->href ?? Str::random(),//跳转地址
+                'href'=>$request->href ?? '',//跳转地址
                 'contents'=>$request->contents ?? '空',//富文本
             ];
 
@@ -565,11 +557,9 @@ class AdminController extends AdminBase
 
             $pageInfo=$this->offset($request);
 
-            $bannerActionList=DB::table('bannerAction');
-
             $tmp=[];
-            $tmp['list']=$bannerActionList->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=$bannerActionList->offset(head($pageInfo))->limit(last($pageInfo))->count();
+            $tmp['list']=DB::table('bannerAction')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('bannerAction')->count();
 
             $res=[
                 'bannerActionList'=>$tmp
@@ -1288,9 +1278,6 @@ class AdminController extends AdminBase
 
         return response()->json($this->createReturn(200,[]));
     }
-
-
-
 
 
 
