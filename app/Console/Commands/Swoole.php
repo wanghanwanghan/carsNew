@@ -89,7 +89,7 @@ class Swoole extends Command
             if ($this->ws->isEstablished($fd))
             {
                 //$this->ws->push($fd,$request->get['message']);
-                $this->ws->push($fd,$num);
+                $this->ws->push($fd,$request->post['orderInfo']);
             }
         }
     }

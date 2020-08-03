@@ -383,10 +383,6 @@ class Index extends BusinessBase
         $res['list']=$carInfo['data'];
         $res['total']=$carInfo['total'];
 
-
-        dd($this->curl(['orderInfo'=>json_encode(['w'=>123,'duan'=>321])]));
-
-
         return $res;
     }
 
@@ -803,6 +799,8 @@ class Index extends BusinessBase
             $code=200;
             $res=order::create($insert);
             $orderId=$res->orderId;
+
+            $this->curl(['orderInfo'=>json_encode($insert)]);
 
         }catch (\Exception $e)
         {
