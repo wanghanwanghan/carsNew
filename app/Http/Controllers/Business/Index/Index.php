@@ -691,7 +691,7 @@ class Index extends BusinessBase
 
         $payment===1 ? $payment='全款' : $payment='违章押金';
 
-        $orderId=control::getUuid();
+        //$orderId=control::getUuid();
 
         //日租还是出行，还是摩托的价格
         $carInfo=carModel::find($carModelId);
@@ -781,6 +781,8 @@ class Index extends BusinessBase
         {
             $getCarWay='送车';
         }
+
+        $orderId=$this->getOrderId('微信小程序',$orderType,'待选择',time(),users::where('phone',$phone)->first()->id);
 
         $insert=[
             'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
@@ -1074,7 +1076,9 @@ class Index extends BusinessBase
         $money=Redis::hget('purchaseList',$type);
 
         //创建订单
-        $orderId=control::getUuid(24).'purchase';
+        $orderId=$this->getOrderId('微信小程序','充值','待选择',time(),users::where('phone',$phone)->first()->id);
+        $orderId.='purchase';
+
         $body="{$type}_充值";
 
         purchaseOrder::create([
