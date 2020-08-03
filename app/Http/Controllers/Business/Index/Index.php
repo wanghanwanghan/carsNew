@@ -1055,11 +1055,27 @@ class Index extends BusinessBase
 
         if (!empty($orderId))
         {
-            $data=order::where('orderId',$orderId)->first()->toArray();
+            $data=[order::where('orderId',$orderId)->first()->toArray()];
         }else
         {
             $data=order::where('account',$phone)->get()->toArray();
         }
+
+        foreach ($data as &$one)
+        {
+            //补充车辆信息
+            $one['carModelInfo']=carModel::find($one['carModelId'])->toArray();
+
+            $one['carModelInfo']['carTypeInfo']=carType::find($one['carModelInfo']['carType'])->toArray();
+
+            $one['carModelInfo']['carBrandInfo']=carBrand::find($one['carModelInfo']['carBrandId'])->toArray();
+
+            //补充车行信息
+            $one['carBelongInfo']=carBelong::find($one['carBelongId'])->toArray();
+
+            $one['carBelongInfo']['cityInfo']=chinaArea::find($one['carBelongInfo']['cityId'])->toArray();
+        }
+        unset($one);
 
         return response()->json($this->createReturn(200,$data));
     }
