@@ -4,13 +4,10 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Redis;
 
 class Swoole extends Command
 {
     public $ws;
-
-    static $send = false;
 
     protected $signature = 'swoole {action?}';
 
@@ -73,10 +70,6 @@ class Swoole extends Command
     public function open($ws, $request)
     {
         $ws->push($request->fd, 'socket started , hello kangfei');
-
-        Redis::sadd('orderSocketFd', $request->fd);
-
-        if (!self::$send) $this->send($ws);
     }
 
     public function message($ws, $frame)
@@ -99,15 +92,6 @@ class Swoole extends Command
 
     public function close($ws, $fd)
     {
-        Redis::srem('orderSocketFd', $fd);
-    }
 
-    private function send($ws)
-    {
-
-
-
-
-        return true;
     }
 }
