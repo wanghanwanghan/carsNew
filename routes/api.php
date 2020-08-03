@@ -41,7 +41,7 @@ Route::group(['prefix'=>'admin'],function ()
 });
 
 //business
-Route::group(['prefix'=>'v1'],function ()
+Route::group(['prefix'=>'v1','middleware'=>['statistics']],function ()
 {
     //需要登录的
     Route::group(['middleware'=>['testMiddleware']],function ()

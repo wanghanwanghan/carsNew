@@ -30,6 +30,6 @@ class AdminBase extends Controller
 
     public function excelTest(Request $request, OrderExport $orderExport)
     {
-        return $orderExport->withinDays(20);
+        return $orderExport->exec();
     }
 }
