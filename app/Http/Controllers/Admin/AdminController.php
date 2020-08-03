@@ -560,6 +560,16 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //删除banner
+    public function deleteBanner(Request $request)
+    {
+        $bannerId=$request->bannerId;
+
+        banner::where('id',$bannerId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
     //把文章content变成一行一行的，用<p>标签分割
     private function handleContent($content)
     {
