@@ -383,10 +383,6 @@ class Index extends BusinessBase
         $res['list']=$carInfo['data'];
         $res['total']=$carInfo['total'];
 
-
-        $this->curl(['orderInfo'=>json_encode(['wanghan'=>'duanran'])]);
-
-
         return $res;
     }
 

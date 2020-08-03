@@ -88,8 +88,8 @@ class Swoole extends Command
             // 需要先判断是否是正确的websocket连接，否则有可能会push失败
             if ($this->ws->isEstablished($fd))
             {
-                //$this->ws->push($fd,$request->get['message']);
-                $this->ws->push($fd,$request->post['orderInfo']);
+                //$this->ws->push($fd,$request->post['orderInfo']);
+                $this->ws->push($fd,$num);
             }
         }
     }
