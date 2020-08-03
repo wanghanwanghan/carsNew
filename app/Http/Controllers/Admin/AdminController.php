@@ -533,6 +533,33 @@ class AdminController extends AdminBase
         }
     }
 
+    //编辑banner
+    public function editBanner(Request $request)
+    {
+        $bannerId=$request->bannerId;
+        $name=$request->name;
+        $image=$request->image;
+        $isShow=$request->isShow;
+        $level=$request->level;
+        $type=$request->type;
+        $href=$request->href;
+        $contents=$request->contents;
+
+        $bannerInfo=banner::find($bannerId);
+
+        $bannerInfo->name=$name;
+        $bannerInfo->image=$image;
+        $bannerInfo->isShow=$isShow;
+        $bannerInfo->level=$level;
+        $bannerInfo->type=$type;
+        $bannerInfo->href=$href;
+        $bannerInfo->contents=$contents;
+
+        $bannerInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
     //把文章content变成一行一行的，用<p>标签分割
     private function handleContent($content)
     {
@@ -546,51 +573,6 @@ class AdminController extends AdminBase
         }
 
         return $tmp;
-    }
-
-    //创建banner的活动页
-    public function createBannerAction(Request $request)
-    {
-        if ($request->getMethod() === 'GET')
-        {
-            //刚打开页面
-
-            $pageInfo=$this->offset($request);
-
-            $tmp=[];
-            $tmp['list']=DB::table('bannerAction')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
-            $tmp['total']=DB::table('bannerAction')->count();
-
-            $res=[
-                'bannerActionList'=>$tmp
-            ];
-
-            return response()->json($this->createReturn(200,$res));
-
-        }else
-        {
-            //要插入数据了
-            $data=[
-                'long'=>$request->long ?? Str::random(),//长标题
-                'short'=>$request->short ?? Str::random(),//端标题
-                'content'=>$request->contents ?? Str::random(),//内容富文本
-                'click'=>$request->click ?? 1,//点击量默认是1
-                'createAt'=>$request->createAt ?? time(),//创建时间
-            ];
-
-            try
-            {
-                $code=200;
-
-                bannerAction::create($data);
-
-            }catch (\Exception $e)
-            {
-                $code=210;
-            }
-
-            return response()->json($this->createReturn($code));
-        }
     }
 
     //获取订单

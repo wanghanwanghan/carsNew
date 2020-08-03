@@ -19,7 +19,8 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'delete/carBrand','Admin\AdminController@deleteCarBrand');//删除品牌
     Route::match(['get','post'],'create/coupon','Admin\AdminController@createCoupon');//创建优惠券
     Route::match(['get','post'],'create/banner','Admin\AdminController@createBanner');//创建banner
-    Route::match(['get','post'],'create/bannerAction','Admin\AdminController@createBannerAction');//创建banner的活动页
+    Route::match(['get','post'],'edit/banner','Admin\AdminController@editBanner');//修改banner
+    Route::match(['get','post'],'delete/banner','Admin\AdminController@deleteBanner');//删除banner
     Route::match(['get','post'],'get/order','Admin\AdminController@getOrder');//获取订单
     Route::match(['get','post'],'refund/order','Admin\AdminController@refundOrder');//订单退款
     Route::match(['get','post'],'setStatus/order','Admin\AdminController@setOrderStatus');//修改订单状态
