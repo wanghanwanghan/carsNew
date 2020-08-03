@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Models\order;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -79,13 +80,16 @@ class Swoole extends Command
 
     public function request($request, $response)
     {
+        //查一下当前有几个待支付
+        $num=order::where('orderStatus','待支付')->count();
+
         foreach ($this->ws->connections as $fd)
         {
             // 需要先判断是否是正确的websocket连接，否则有可能会push失败
             if ($this->ws->isEstablished($fd))
             {
                 //$this->ws->push($fd,$request->get['message']);
-                $this->ws->push($fd,$request->get('orderInfo'));
+                $this->ws->push($fd,$num);
             }
         }
     }
