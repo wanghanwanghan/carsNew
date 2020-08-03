@@ -923,6 +923,8 @@ class Index extends BusinessBase
                 $userInfo->save();
                 $orderInfo->save();
 
+                $this->curl(['触发']);
+
                 return response()->json($this->createReturn(200,[],'支付成功'));
             }
 
@@ -936,6 +938,8 @@ class Index extends BusinessBase
                 $orderInfo->payWay=$payWay;
                 $orderInfo->orderStatus='待确认';
                 $orderInfo->save();
+
+                $this->curl(['触发']);
 
                 return response()->json($this->createReturn(200,[],'支付成功'));
             }
@@ -952,6 +956,8 @@ class Index extends BusinessBase
         $body="极客超跑-租车服务";
 
         $miniApp=MiniAppPay::getInstance()->createMiniAppOrder($jsCode,$orderId,$body,$payMoney);
+
+        $this->curl(['触发']);
 
         return response()->json($this->createReturn(200,$miniApp));
     }

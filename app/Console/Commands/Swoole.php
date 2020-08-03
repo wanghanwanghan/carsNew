@@ -70,9 +70,12 @@ class Swoole extends Command
 
     public function open($ws, $request)
     {
-        $num=order::where('orderStatus','待支付')->count();
+        $arr=[
+            '待支付'=>order::where('orderStatus','待支付')->count(),
+            '待确认'=>order::where('orderStatus','待确认')->count(),
+        ];
 
-        $ws->push($request->fd, $num);
+        $ws->push($request->fd, json_encode($arr));
     }
 
     public function message($ws, $frame)
@@ -82,8 +85,10 @@ class Swoole extends Command
 
     public function request($request, $response)
     {
-        //查一下当前有几个待支付
-        $num=order::where('orderStatus','待支付')->count();
+        $arr=[
+            '待支付'=>order::where('orderStatus','待支付')->count(),
+            '待确认'=>order::where('orderStatus','待确认')->count(),
+        ];
 
         foreach ($this->ws->connections as $fd)
         {
@@ -91,7 +96,7 @@ class Swoole extends Command
             if ($this->ws->isEstablished($fd))
             {
                 //$this->ws->push($fd,$request->post['orderInfo']);
-                $this->ws->push($fd,$num);
+                $this->ws->push($fd,json_encode($arr));
             }
         }
     }
