@@ -29,10 +29,10 @@ class BusinessBase extends Controller
     private function orderType($orderType='自驾')
     {
         $arr=[
+            '充值'=>'0',
             '自驾'=>'1',
             '出行'=>'2',
             '摩托'=>'3',
-            '充值'=>'9',
         ];
 
         return $arr[$orderType];
@@ -41,9 +41,9 @@ class BusinessBase extends Controller
     private function payWay($payWay='钱包')
     {
         $arr=[
+            '待选择'=>'0',
             '钱包'=>'1',
             '微信支付'=>'2',
-            '待选择'=>'9',
         ];
 
         return $arr[$payWay];
