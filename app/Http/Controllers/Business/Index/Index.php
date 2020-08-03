@@ -383,6 +383,10 @@ class Index extends BusinessBase
         $res['list']=$carInfo['data'];
         $res['total']=$carInfo['total'];
 
+
+        dd($this->curl(['wanghan'=>'duanran']));
+
+
         return $res;
     }
 

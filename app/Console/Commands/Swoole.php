@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 
@@ -85,7 +86,15 @@ class Swoole extends Command
 
     public function request($request, $response)
     {
-
+        foreach ($this->ws->connections as $fd)
+        {
+            // 需要先判断是否是正确的websocket连接，否则有可能会push失败
+            if ($this->ws->isEstablished($fd))
+            {
+                //$this->ws->push($fd,$request->get['message']);
+                $this->ws->push($fd,Carbon::now()->format('Y-m-d H:i:s'));
+            }
+        }
     }
 
     public function close($ws, $fd)
