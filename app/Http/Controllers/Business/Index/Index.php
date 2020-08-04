@@ -1128,6 +1128,7 @@ class Index extends BusinessBase
             'orderType'=>$type,
             'orderStatus'=>'待支付',
             'purchaseMoney'=>$money,
+            'addMoney'=>$moneyInfo['money'],
             'unixTime'=>time(),
             'year'=>date('Y'),
             'month'=>date('m'),

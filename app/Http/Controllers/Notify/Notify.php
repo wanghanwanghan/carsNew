@@ -90,7 +90,7 @@ class Notify extends Controller
             //钱包中加钱
             $userInfo=users::where('phone',$orderInfo->phone)->first();
 
-            $userInfo->money+=$orderInfo->purchaseMoney;
+            $userInfo->money+=$orderInfo->addMoney;
 
             $userInfo->save();
 
