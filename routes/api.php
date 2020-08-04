@@ -34,7 +34,10 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'index','Admin\AdminController@index');//首页
     Route::match(['get','post'],'edit/notifyPhone','Admin\AdminController@editNotifyPhone');//首页
     Route::match(['get','post'],'getOrderNumByStatus','Admin\AdminController@getOrderNumByStatus');
-    Route::match(['get','post'],'setRentPersonInfo/order','Admin\AdminController@setRentPersonInfo');//
+    Route::match(['get','post'],'setRentPersonInfo/order','Admin\AdminController@setRentPersonInfo');
+    Route::match(['get','post'],'create/label','Admin\AdminController@createLabel');
+    Route::match(['get','post'],'edit/label','Admin\AdminController@editLabel');
+    Route::match(['get','post'],'delete/label','Admin\AdminController@deleteLabel');
 
 
 

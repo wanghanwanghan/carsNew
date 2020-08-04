@@ -7,6 +7,7 @@ use App\Http\Models\bannerAction;
 use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
+use App\Http\Models\carLabel;
 use App\Http\Models\carLicenseType;
 use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
@@ -192,6 +193,7 @@ class AdminController extends AdminBase
         $level=$request->level;
         $kilPrice=$request->kilPrice;
         $carBelongArr=json_decode($request->carBelongArr,true);
+        $carLabelArr=json_decode($request->carLabelArr,true);
         $carDesc=$request->carDesc;
 
         //搜索车型
@@ -221,6 +223,15 @@ class AdminController extends AdminBase
 
         DB::table('carModelCarBelong')->where('carModelId',$carModelId)->delete();
         DB::table('carModelCarBelong')->insert($carBelongArr);
+
+        foreach ($carLabelArr as &$one)
+        {
+            $one['carModelId']=$carModelId;
+        }
+        unset($one);
+
+        DB::table('carModelLabel')->where('carModelId',$carModelId)->delete();
+        DB::table('carModelLabel')->insert($carBelongArr);
 
         return response()->json($this->createReturn(200,[]));
     }
@@ -1271,8 +1282,76 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //获取标签label
+    public function createLabel(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
 
+            $pageInfo=$this->offset($request);
 
+            $tmp=[];
+            $tmp['list']=DB::table('carLabel')->offset(head($pageInfo))->limit(last($pageInfo))->get()->toArray();
+            $tmp['total']=DB::table('carLabel')->count();
+
+            $res=[
+                'carLabelList'=>$tmp
+            ];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'label'=>$request->label ?? Str::random(),
+            ];
+
+            try
+            {
+                $code=200;
+
+                carLabel::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
+
+    //编辑label
+    public function editLabel(Request $request)
+    {
+        $labelId=$request->labelId ?? 1;
+
+        $label=$request->label ?? '无';
+
+        $labelInfo=carLabel::find($labelId);
+
+        $labelInfo->label=$label;
+
+        $labelInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除label
+    public function deleteLabel(Request $request)
+    {
+        $labelId=$request->labelId;
+
+        //删除label
+        carLabel::where('id',$labelId)->delete();
+
+        //删除关联表
+        carModelLabel::where('carLabelId',$labelId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 
