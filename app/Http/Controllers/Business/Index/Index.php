@@ -1071,9 +1071,15 @@ class Index extends BusinessBase
             $one['carModelInfo']['carBrandInfo']=carBrand::find($one['carModelInfo']['carBrandId'])->toArray();
 
             //补充车行信息
-            $one['carBelongInfo']=carBelong::find($one['carBelongId'])->toArray();
+            if ($one['carBelongId'] > 0)
+            {
+                $one['carBelongInfo']=carBelong::find($one['carBelongId'])->toArray();
 
-            $one['carBelongInfo']['cityInfo']=chinaArea::find($one['carBelongInfo']['cityId'])->toArray();
+                $one['carBelongInfo']['cityInfo']=chinaArea::find($one['carBelongInfo']['cityId'])->toArray();
+            }else
+            {
+                $one['carBelongInfo']=new \stdClass();
+            }
         }
         unset($one);
 
