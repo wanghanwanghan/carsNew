@@ -1112,7 +1112,7 @@ class Index extends BusinessBase
 
         $moneyInfo=Redis::hget('purchaseList',$type);
 
-        $moneyInfo=json_decode($moneyInfo);
+        $moneyInfo=json_decode($moneyInfo,true);
 
         $money=$moneyInfo['payMoney'];
 
