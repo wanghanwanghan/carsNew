@@ -715,11 +715,11 @@ class Index extends BusinessBase
 
                 //算两点间距离乘以每公里价格
                 //$lat纬度 $lng经度
-                $start=explode('_',$start);
-                $destination=explode('_',$destination);
+                $startTmp=explode('_',$start);
+                $destinationTmp=explode('_',$destination);
                 $key=control::getUuid();
-                Redis::geoadd($key,head($start),last($start),'start');
-                Redis::geoadd($key,head($destination),last($destination),'destination');
+                Redis::geoadd($key,head($startTmp),last($startTmp),'start');
+                Redis::geoadd($key,head($destinationTmp),last($destinationTmp),'destination');
                 $km=Redis::geodist($key,'start','destination','km');
                 $payMoney=$carInfo->kilPrice * $km + $payMoney;
                 Redis::expire($key,5);
@@ -800,7 +800,7 @@ class Index extends BusinessBase
             $res=order::create($insert);
             $orderId=$res->orderId;
 
-            $this->curl(['orderInfo'=>json_encode($insert)]);
+            $this->curl(['触发']);
 
         }catch (\Exception $e)
         {
