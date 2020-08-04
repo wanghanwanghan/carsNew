@@ -1093,7 +1093,14 @@ class Index extends BusinessBase
 
         $res=Redis::hgetall('purchaseList');
 
-        return response()->json($this->createReturn(200,$res));
+        $tmp=[];
+
+        foreach ($res as $type => $val)
+        {
+            $tmp[]=['type'=>$type,'info'=>json_decode($val,true)];
+        }
+
+        return response()->json($this->createReturn(200,$tmp));
     }
 
     //充值
