@@ -1110,7 +1110,11 @@ class Index extends BusinessBase
         $type=$request->type ?? 't1';
         $jsCode=$request->jsCode ?? 123;
 
-        $money=Redis::hget('purchaseList',$type);
+        $moneyInfo=Redis::hget('purchaseList',$type);
+
+        $moneyInfo=json_decode($moneyInfo);
+
+        $money=$moneyInfo['payMoney'];
 
         //创建订单
         $orderId=$this->getOrderId('微信小程序','充值','待选择',time(),users::where('phone',$phone)->first()->id);
