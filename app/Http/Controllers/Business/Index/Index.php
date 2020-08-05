@@ -873,12 +873,25 @@ class Index extends BusinessBase
 
         $orderId=$this->getOrderId('微信小程序',$orderType,'待选择',time(),users::where('phone',$phone)->first()->id);
 
+        //影响条件1，早8晚10，1倍
+        $priceCond1=(int)date('H');
+
+        if ($priceCond1 >= 8 && $priceCond1 <= 22)
+        {
+            $priceCond1=1;
+        }else
+        {
+            $priceCond1=1.1;
+        }
+
+        $payMoney=$payMoney * $priceCond1;
+
         $insert=[
             'orderId'=>$orderId, 'coupon1'=>$couponId, 'carModelId'=>$carModelId,
             'carBelongId'=>$carBelongId, 'orderType'=>$orderType, 'orderStatus'=>'待支付', 'account'=>$phone,
             'orderPrice'=>sprintf('%.2f',$payMoney), 'damagePrice'=>$damagePrice, 'forfeitPrice'=>$forfeitPrice,
             'payWay'=>'待选择', 'payment'=>$payment, 'startTime'=>$startTime, 'stopTime'=>$stopTime,
-            'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,
+            'getCarWay'=>$getCarWay, 'getCarPlace'=>$getCarPlace,'priceCond1'=>$priceCond1,
             'rentPersonName'=>$rentPersonName, 'rentPersonPhone'=>$rentPersonPhone, 'start'=>$start, 'destination'=>$destination,
             'NotifyInfo'=>'','year'=>date('Y'),'month'=>date('m'),'day'=>date('d'),'hour'=>date('H')
         ];
