@@ -571,6 +571,8 @@ class Index extends BusinessBase
         $carModelId=$request->carModelId;
         $rentDays=(int)$request->rentDays;
         $orderType=$request->orderType ?? '自驾';
+        $start=$request->start ?? '';
+        $destination=$request->destination ?? '';
 
         //找出这辆车需要花费多少钱
         $carInfo=carModel::find($carModelId);
@@ -630,6 +632,18 @@ class Index extends BusinessBase
                 {
                     $payMoney=sprintf('%.2f',$goPrice - ($goPrice * $goDiscount * 0.01));
                 }
+
+                //算两点间距离乘以每公里价格
+                //$lat纬度 $lng经度
+                $startTmp=explode('_',$start);
+                $destinationTmp=explode('_',$destination);
+                $key=control::getUuid();
+                Redis::geoadd($key,head($startTmp),last($startTmp),'start');
+                Redis::geoadd($key,head($destinationTmp),last($destinationTmp),'destination');
+                $km=Redis::geodist($key,'start','destination','km');
+                $km=ceil($km);
+                $payMoney=$carInfo->kilPrice * $km + $payMoney;
+                Redis::expire($key,5);
 
                 break;
         }
