@@ -1155,6 +1155,13 @@ class Index extends BusinessBase
             {
                 $one['carBelongInfo']=new \stdClass();
             }
+
+            //补充标签
+            $carLabelIdArr=Arr::flatten(carModelLabel::where('carModelId',$one['carModelId'])->get(['carLabelId'])->toArray());
+
+            $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
+
+            $one['carLabelInfo']=$carLabelInfo;
         }
         unset($one);
 
