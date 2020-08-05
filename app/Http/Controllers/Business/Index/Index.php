@@ -573,6 +573,7 @@ class Index extends BusinessBase
         $orderType=$request->orderType ?? '自驾';
         $start=$request->start ?? '';
         $destination=$request->destination ?? '';
+        $startTime=$request->startTime ?? '';
 
         //找出这辆车需要花费多少钱
         $carInfo=carModel::find($carModelId);
@@ -646,7 +647,7 @@ class Index extends BusinessBase
                 Redis::expire($key,5);
 
                 //影响条件1，早8晚10，1倍
-                $priceCond1=(int)date('H');
+                $priceCond1=(int)date('H',$startTime);
 
                 if ($priceCond1 >= 8 && $priceCond1 <= 22)
                 {
@@ -828,7 +829,7 @@ class Index extends BusinessBase
                 Redis::expire($key,5);
 
                 //影响条件1，早8晚10，1倍
-                $priceCond1=(int)date('H');
+                $priceCond1=(int)date('H',$startTime);
 
                 if ($priceCond1 >= 8 && $priceCond1 <= 22)
                 {
@@ -1203,6 +1204,9 @@ class Index extends BusinessBase
             $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
 
             $one['carLabelInfo']=$carLabelInfo;
+
+            //补全优惠券信息
+            $one['coupon1Info']=coupon::where('id',$one['coupon1'])->get()->toArray();
         }
         unset($one);
 
