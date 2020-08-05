@@ -721,6 +721,7 @@ class Index extends BusinessBase
                 Redis::geoadd($key,head($startTmp),last($startTmp),'start');
                 Redis::geoadd($key,head($destinationTmp),last($destinationTmp),'destination');
                 $km=Redis::geodist($key,'start','destination','km');
+                $km=ceil($km);
                 $payMoney=$carInfo->kilPrice * $km + $payMoney;
                 Redis::expire($key,5);
 
