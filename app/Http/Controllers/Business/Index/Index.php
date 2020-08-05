@@ -1058,7 +1058,7 @@ class Index extends BusinessBase
             $data=[order::where('orderId',$orderId)->first()->toArray()];
         }else
         {
-            $data=order::where('account',$phone)->get()->toArray();
+            $data=order::where('account',$phone)->orderBy('created_at','desc')->get()->toArray();
         }
 
         foreach ($data as &$one)
