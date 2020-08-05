@@ -119,6 +119,13 @@ class AdminController extends AdminBase
                 unset($one);
 
                 $oneCar->carBelongInfo=$rel;
+
+                //添加标签
+                $carLabelIdArr=Arr::flatten(carModelLabel::where('carModelId',$oneCar->id)->get(['carLabelId'])->toArray());
+
+                $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
+
+                $oneCar->carLabelInfo=$carLabelInfo;
             }
             unset($oneCar);
 

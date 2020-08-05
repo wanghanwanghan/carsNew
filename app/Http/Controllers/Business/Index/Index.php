@@ -183,7 +183,7 @@ class Index extends BusinessBase
         ];
 
         return response()->json($this->createReturn(200,[
-            'banner'=>banner::all()->toArray(),
+            'banner'=>banner::orderBy('level','desc')->where('isShow',1)->get()->toArray(),
             'module'=>$module,
         ]));
     }
