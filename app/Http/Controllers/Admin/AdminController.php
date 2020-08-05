@@ -231,7 +231,7 @@ class AdminController extends AdminBase
         unset($one);
 
         DB::table('carModelLabel')->where('carModelId',$carModelId)->delete();
-        DB::table('carModelLabel')->insert($carBelongArr);
+        DB::table('carModelLabel')->insert($carLabelArr);
 
         return response()->json($this->createReturn(200,[]));
     }
