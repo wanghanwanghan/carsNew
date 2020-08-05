@@ -7,8 +7,10 @@ use App\Http\Models\banner;
 use App\Http\Models\carBelong;
 use App\Http\Models\carBrand;
 use App\Http\Models\carInfo;
+use App\Http\Models\carLabel;
 use App\Http\Models\carModel;
 use App\Http\Models\carModelCarBelong;
+use App\Http\Models\carModelLabel;
 use App\Http\Models\carType;
 use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
@@ -261,6 +263,20 @@ class Index extends BusinessBase
 
             $all=$all->paginate($pageSize,['*'],'',$page)->toArray();
 
+            foreach ($all['data'] as &$one)
+            {
+                //添加品牌
+                $one['carBrandId']=carBrand::find($one['carBrandId'])->toArray();
+
+                //添加标签
+                $carLabelIdArr=Arr::flatten(carModelLabel::where('carModelId',$one['id'])->get(['carLabelId'])->toArray());
+
+                $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
+
+                $one['label']=$carLabelInfo;
+            }
+            unset($one);
+
             $res['list']=$all['data'];
             $res['total']=$all['total'];
 
@@ -343,7 +359,15 @@ class Index extends BusinessBase
 
             foreach ($all['data'] as &$one)
             {
+                //添加品牌
                 $one['carBrandId']=carBrand::find($one['carBrandId'])->toArray();
+
+                //添加标签
+                $carLabelIdArr=Arr::flatten(carModelLabel::where('carModelId',$one['id'])->get(['carLabelId'])->toArray());
+
+                $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
+
+                $one['label']=$carLabelInfo;
             }
             unset($one);
 
@@ -506,7 +530,12 @@ class Index extends BusinessBase
 
         $carDetail['carBrandId']=carBrand::find($carDetail['carBrandId'])->toArray();
 
-        $carDetail['label']=[];
+        //添加标签
+        $carLabelIdArr=Arr::flatten(carModelLabel::where('carModelId',$carModelId)->get(['carLabelId'])->toArray());
+
+        $carLabelInfo=carLabel::whereIn('id',$carLabelIdArr)->get()->toArray();
+
+        $carDetail['label']=$carLabelInfo;
 
         return response()->json($this->createReturn(200,$carDetail));
     }
@@ -661,7 +690,12 @@ class Index extends BusinessBase
             $available[]=$val;
         }
 
-        return response()->json($this->createReturn(200,['coupon'=>['available'=>$available,'disabled'=>$disabled],'pay'=>$pay]));
+        return response()->json($this->createReturn(200,[
+            'coupon'=>[
+                'available'=>$available,'disabled'=>$disabled
+            ],
+            'pay'=>$pay
+        ]));
     }
 
     //保存或更新用户的驾照，或者身份证图片
