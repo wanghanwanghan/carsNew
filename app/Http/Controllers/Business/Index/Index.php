@@ -540,7 +540,7 @@ class Index extends BusinessBase
     {
         $phone=$request->phone;
         $carModelId=$request->carModelId;
-        $rentDays=$request->rentDays;
+        $rentDays=(int)$request->rentDays;
         $orderType=$request->orderType ?? '自驾';
 
         //找出这辆车需要花费多少钱
@@ -558,13 +558,51 @@ class Index extends BusinessBase
         //日租折扣
         $dayDiscount=$carInfo->dayDiscount;
 
-        if ($dayDiscount==0)
+        //出行价格
+        $goPrice=$carInfo->goPrice;
+
+        //出行折扣
+        $goDiscount=$carInfo->goDiscount;
+
+        switch ($orderType)
         {
-            $payMoney=$dayPrice * $rentDays;
-        }else
-        {
-            $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount * 0.01));
-            $payMoney=$payMoney * $rentDays;
+            case '自驾':
+
+                if ($dayDiscount==0)
+                {
+                    $payMoney=$dayPrice * $rentDays;
+                }else
+                {
+                    $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount * 0.01));
+                    $payMoney=$payMoney * $rentDays;
+                }
+
+                break;
+
+            case '摩托':
+
+                if ($dayDiscount===0)
+                {
+                    $payMoney=$dayPrice * $rentDays;
+                }else
+                {
+                    $payMoney=sprintf('%.2f',$dayPrice - ($dayPrice * $dayDiscount * 0.01));
+                    $payMoney=$payMoney * $rentDays;
+                }
+
+                break;
+
+            case '出行':
+
+                if ($goDiscount==0)
+                {
+                    $payMoney=$goPrice;
+                }else
+                {
+                    $payMoney=sprintf('%.2f',$goPrice - ($goPrice * $goDiscount * 0.01));
+                }
+
+                break;
         }
 
         $pay=[
@@ -572,6 +610,8 @@ class Index extends BusinessBase
             'forfeitPrice'=>$forfeitPrice,
             'dayPrice'=>$dayPrice,
             'dayDiscount'=>$dayDiscount,
+            'goPrice'=>$goPrice,
+            'goDiscount'=>$goDiscount,
             'payMoney'=>$payMoney,
         ];
 
