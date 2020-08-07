@@ -55,7 +55,7 @@ class Index extends BusinessBase
     }
 
     //根据timeRange从订单表中取出哪些车被消耗了多少辆
-    private function getCarInfoIdByTimeRange($start,$stop,$carBelongId,$orderType=['自驾','出行','摩托'])
+    private function getCarInfoIdByTimeRange($start,$stop,$carBelongId,$orderType=['自驾','摩托'])
     {
         //首先要根据timeRange从表中查出，每种车，有多少被预定了
         $carOrder=order::where(function ($q) use ($start,$stop){
@@ -236,7 +236,7 @@ class Index extends BusinessBase
         $orderBy=$request->orderBy ?? 1;
         $page=$request->page ?? 1;
         $pageSize=$request->pageSize ?? 10;
-        $orderType=['自驾','出行'];
+        $orderType=['自驾'];
 
         if (empty($lng) || empty($lat))
         {
@@ -562,6 +562,57 @@ class Index extends BusinessBase
         ];
 
         return response()->json($this->createReturn(200,['statusList'=>$status,'licenseStatus'=>$licenseStatus]));
+    }
+
+    public function checkCarAvailable(Request $request)
+    {
+        $orderType=$request->orderType ?? '出行';
+
+        if ($orderType === '出行') return response()->json($this->createReturn(201,[],'出行的订单'));
+
+        //先根据经纬度查询最近的车行
+        $start=explode('_',$request->start);
+        $lng=head($start);
+        $lat=last($start);
+
+        //查询出车行，找一个最近的
+        $carBelong=carBelong::get()->toArray();
+
+        //随便写个key
+        $key=__FUNCTION__.Str::random(8);
+
+        //添加近去，和用户选择的地方一起添加
+        foreach ($carBelong as $one)
+        {
+            Redis::geoadd($key,$one['lng'],$one['lat'],$one['id']);
+        }
+
+        Redis::geoadd($key,$lng,$lat,'now');
+
+        //开始对比距离
+        foreach ($carBelong as $one)
+        {
+            $dist[$one['id']]=Redis::geodist($key,$one['id'],'now');
+        }
+
+        Redis::expire($key,60);
+
+        //值 升序
+        asort($dist,SORT_NUMERIC);
+
+        //取第一个就是最近的车行id
+        $carBelongId=key($dist);
+
+        //最后返回的是空闲可用的carModelId
+        $carModelId=$this->getCarInfoIdByTimeRange($request->startTime,$request->stopTime,[$carBelongId],[$orderType]);
+
+        //然后查询该车辆有没有空闲
+        if (!in_array($request->carModelId,$carModelId)) return response()->json($this->createReturn(201,[],'车型不可用'));
+
+        $res['carBelongInfo']=carBelong::find($carBelong)->toArray();
+        $res['cityInfo']=chinaArea::find($res['carBelongInfo']['cityId']);
+
+        return response()->json($this->createReturn(200,$res));
     }
 
     //预定车辆
