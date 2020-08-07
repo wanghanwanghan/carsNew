@@ -243,6 +243,26 @@ class Index extends BusinessBase
             //展示所有车型
             $all=carModel::whereIn('carType',[1,2]);
 
+            switch ($orderBy)
+            {
+                case 1:
+                    //根据权重排序
+                    $all->orderBy('level','desc');
+                    break;
+                case 2:
+                    //价格desc
+                    $all->orderBy('dayPrice','desc');
+                    break;
+                case 3:
+                    //价格asc
+                    $all->orderBy('dayPrice','asc');
+                    break;
+                case 4:
+                    //根据订单量
+                    break;
+                default:
+            }
+
             if (!empty($cond))
             {
                 //先查出品牌
