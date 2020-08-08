@@ -31,7 +31,11 @@ class RefundOrder extends Command
         {
             $orderId=$oneRefundOrder['orderId'];
 
-            $orderInfo=order::where('orderId',$orderId)->first()->toArray();
+            $orderInfo=order::where('orderId',$orderId)->first();
+
+            if (empty($orderInfo)) continue;
+
+            $orderInfo=$orderInfo->toArray();
 
             //退款到钱包还是微信
             $payWay=$orderInfo['payWay'];
