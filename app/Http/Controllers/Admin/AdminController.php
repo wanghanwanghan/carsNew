@@ -422,6 +422,9 @@ class AdminController extends AdminBase
         //车行里相关的车全删了
         carModelCarBelong::where('carBelongId',$carBelongId)->delete();
 
+        //删除这个车行里所有的订单
+        order::where('carBelongId',$carBelongId)->delete();
+
         return response()->json($this->createReturn(200,[]));
     }
 
