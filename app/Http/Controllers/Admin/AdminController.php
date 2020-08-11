@@ -152,9 +152,9 @@ class AdminController extends AdminBase
                 'damagePrice'=>$request->damagePrice ?? 20000,//车损押金
                 'forfeitPrice'=>$request->forfeitPrice ?? 2000,//违章押金
                 'dayPrice'=>$request->dayPrice ?? 5000,//日租价格
-                'dayDiscount'=>$request->dayDiscount ?? 10,//日租折扣
+                'dayDiscount'=>$request->dayDiscount ?? 0,//日租折扣
                 'goPrice'=>$request->goPrice ?? 3000,//出行价格
-                'goDiscount'=>$request->goDiscount ?? 10,//出行折扣
+                'goDiscount'=>$request->goDiscount ?? 0,//出行折扣
                 'kilPrice'=>$request->kilPrice ?? 20,//每公里价格
             ];
 
