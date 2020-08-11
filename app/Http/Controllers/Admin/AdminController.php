@@ -155,7 +155,7 @@ class AdminController extends AdminBase
                 'dayDiscount'=>$request->dayDiscount ?? 0,//日租折扣
                 'goPrice'=>$request->goPrice ?? 3000,//出行价格
                 'goDiscount'=>$request->goDiscount ?? 0,//出行折扣
-                'kilPrice'=>$request->kilPrice ?? 20,//每公里价格
+                'kilPrice'=>$request->kilPrice ?? 0,//每公里价格
             ];
 
             try
