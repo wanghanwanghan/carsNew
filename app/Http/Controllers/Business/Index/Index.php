@@ -451,9 +451,7 @@ class Index extends BusinessBase
             ->limit($pageSize)->offset($offset)
             ->get()->toArray();
 
-        $total=topics::orderBy('level','desc')
-            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
-            ->count();
+        $total=topics::where(['isShow'=>1,'topicBelong'=>$topicBelong])->count();
 
         return ['list'=>$list,'total'=>$total];
     }
@@ -472,9 +470,7 @@ class Index extends BusinessBase
             ->limit($pageSize)->offset($offset)
             ->get()->toArray();
 
-        $total=topics::orderBy('level','desc')
-            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
-            ->count();
+        $total=topics::where(['isShow'=>1,'topicBelong'=>$topicBelong])->count();
 
         return ['list'=>$list,'total'=>$total];
     }
@@ -493,9 +489,7 @@ class Index extends BusinessBase
             ->limit($pageSize)->offset($offset)
             ->get()->toArray();
 
-        $total=topics::orderBy('level','desc')
-            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
-            ->count();
+        $total=topics::where(['isShow'=>1,'topicBelong'=>$topicBelong])->count();
 
         return ['list'=>$list,'total'=>$total];
     }
