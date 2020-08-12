@@ -39,8 +39,17 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'edit/label','Admin\AdminController@editLabel');
     Route::match(['get','post'],'delete/label','Admin\AdminController@deleteLabel');
 
+    Route::match(['get','post'],'create/AXTG','Admin\AdminController@createAXTG');
+    Route::match(['get','post'],'edit/AXTG','Admin\AdminController@editAXTG');
+    Route::match(['get','post'],'delete/AXTG','Admin\AdminController@deleteAXTG');
 
+    Route::match(['get','post'],'create/JZCY','Admin\AdminController@createJZCY');
+    Route::match(['get','post'],'edit/JZCY','Admin\AdminController@editJZCY');
+    Route::match(['get','post'],'delete/JZCY','Admin\AdminController@deleteJZCY');
 
+    Route::match(['get','post'],'create/CZCZ','Admin\AdminController@createCZCZ');
+    Route::match(['get','post'],'edit/CZCZ','Admin\AdminController@editCZCZ');
+    Route::match(['get','post'],'delete/CZCZ','Admin\AdminController@deleteCZCZ');
 
 });
 

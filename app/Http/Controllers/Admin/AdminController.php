@@ -18,6 +18,7 @@ use App\Http\Models\coupon;
 use App\Http\Models\order;
 use App\Http\Models\purchaseOrder;
 use App\Http\Models\refundInfo;
+use App\Http\Models\topics;
 use App\Http\Models\users;
 use App\Http\Service\UploadImg;
 use Carbon\Carbon;
@@ -1363,10 +1364,269 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //创建 安心托管
+    public function createAXTG(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
 
+            $pageInfo=$this->offset($request);
 
+            $tmp=[];
+            $tmp['list']=DB::table('topics')->where('topicBelong',1)
+                ->offset(head($pageInfo))
+                ->limit(last($pageInfo))
+                ->get()->toArray();
+            $tmp['total']=DB::table('topics')->where('topicBelong',1)->count();
 
+            $res=[
+                'AXTGList'=>$tmp
+            ];
 
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'topicBelong'=>1,
+                'name'=>$request->name ?? Str::random(),//活动名称
+                'image'=>$request->image ?? '',//图片地址
+                'isShow'=>$request->isShow ?? 1,//是否显示
+                'level'=>$request->level ?? mt_rand(1,100),//权重
+                'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
+                'href'=>$request->href ?? '',//跳转地址
+                'contents'=>$request->contents ?? '空',//富文本
+            ];
+
+            try
+            {
+                $code=200;
+
+                topics::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
+
+    //编辑 安心托管
+    public function editAXTG(Request $request)
+    {
+        $topicId=$request->topicId;
+        $name=$request->name;
+        $image=$request->image;
+        $isShow=$request->isShow;
+        $level=$request->level;
+        $type=$request->type;
+        $href=$request->href;
+        $contents=$request->contents;
+
+        $topicInfo=topics::find($topicId);
+
+        $topicInfo->name=$name;
+        $topicInfo->image=$image;
+        $topicInfo->isShow=$isShow;
+        $topicInfo->level=$level;
+        $topicInfo->type=$type;
+        $topicInfo->href=$href;
+        $topicInfo->contents=$contents;
+
+        $topicInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除 安心托管
+    public function deleteAXTG(Request $request)
+    {
+        $topicId=$request->topicId;
+
+        topics::where('id',$topicId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //创建 精致车源
+    public function createJZCY(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
+
+            $pageInfo=$this->offset($request);
+
+            $tmp=[];
+            $tmp['list']=DB::table('topics')->where('topicBelong',2)
+                ->offset(head($pageInfo))
+                ->limit(last($pageInfo))
+                ->get()->toArray();
+            $tmp['total']=DB::table('topics')->where('topicBelong',2)->count();
+
+            $res=[
+                'AXTGList'=>$tmp
+            ];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'topicBelong'=>2,
+                'name'=>$request->name ?? Str::random(),//活动名称
+                'image'=>$request->image ?? '',//图片地址
+                'isShow'=>$request->isShow ?? 1,//是否显示
+                'level'=>$request->level ?? mt_rand(1,100),//权重
+                'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
+                'href'=>$request->href ?? '',//跳转地址
+                'contents'=>$request->contents ?? '空',//富文本
+            ];
+
+            try
+            {
+                $code=200;
+
+                topics::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
+
+    //编辑 精致车源
+    public function editJZCY(Request $request)
+    {
+        $topicId=$request->topicId;
+        $name=$request->name;
+        $image=$request->image;
+        $isShow=$request->isShow;
+        $level=$request->level;
+        $type=$request->type;
+        $href=$request->href;
+        $contents=$request->contents;
+
+        $topicInfo=topics::find($topicId);
+
+        $topicInfo->name=$name;
+        $topicInfo->image=$image;
+        $topicInfo->isShow=$isShow;
+        $topicInfo->level=$level;
+        $topicInfo->type=$type;
+        $topicInfo->href=$href;
+        $topicInfo->contents=$contents;
+
+        $topicInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除 精致车源
+    public function deleteJZCY(Request $request)
+    {
+        $topicId=$request->topicId;
+
+        topics::where('id',$topicId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //创建 超值长租
+    public function createCZCZ(Request $request)
+    {
+        if ($request->getMethod() === 'GET')
+        {
+            //刚打开页面
+
+            $pageInfo=$this->offset($request);
+
+            $tmp=[];
+            $tmp['list']=DB::table('topics')->where('topicBelong',3)
+                ->offset(head($pageInfo))
+                ->limit(last($pageInfo))
+                ->get()->toArray();
+            $tmp['total']=DB::table('topics')->where('topicBelong',3)->count();
+
+            $res=[
+                'AXTGList'=>$tmp
+            ];
+
+            return response()->json($this->createReturn(200,$res));
+
+        }else
+        {
+            //要插入数据了
+            $data=[
+                'topicBelong'=>3,
+                'name'=>$request->name ?? Str::random(),//活动名称
+                'image'=>$request->image ?? '',//图片地址
+                'isShow'=>$request->isShow ?? 1,//是否显示
+                'level'=>$request->level ?? mt_rand(1,100),//权重
+                'type'=>$request->type ?? 1,//是跳转页面还是公众号文章
+                'href'=>$request->href ?? '',//跳转地址
+                'contents'=>$request->contents ?? '空',//富文本
+            ];
+
+            try
+            {
+                $code=200;
+
+                topics::create($data);
+
+            }catch (\Exception $e)
+            {
+                $code=210;
+            }
+
+            return response()->json($this->createReturn($code));
+        }
+    }
+
+    //编辑 超值长租
+    public function editCZCZ(Request $request)
+    {
+        $topicId=$request->topicId;
+        $name=$request->name;
+        $image=$request->image;
+        $isShow=$request->isShow;
+        $level=$request->level;
+        $type=$request->type;
+        $href=$request->href;
+        $contents=$request->contents;
+
+        $topicInfo=topics::find($topicId);
+
+        $topicInfo->name=$name;
+        $topicInfo->image=$image;
+        $topicInfo->isShow=$isShow;
+        $topicInfo->level=$level;
+        $topicInfo->type=$type;
+        $topicInfo->href=$href;
+        $topicInfo->contents=$contents;
+
+        $topicInfo->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //删除 超值长租
+    public function deleteCZCZ(Request $request)
+    {
+        $topicId=$request->topicId;
+
+        topics::where('id',$topicId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 

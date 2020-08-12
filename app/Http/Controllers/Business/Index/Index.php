@@ -16,6 +16,7 @@ use App\Http\Models\chinaArea;
 use App\Http\Models\coupon;
 use App\Http\Models\order;
 use App\Http\Models\purchaseOrder;
+use App\Http\Models\topics;
 use App\Http\Models\users;
 use App\Http\Service\MiniAppPay;
 use App\Http\Service\SendSms;
@@ -439,19 +440,64 @@ class Index extends BusinessBase
     //安心托管
     private function module4(Request $request)
     {
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 5;
+        $topicBelong=1;
 
+        $offset=($page-1)*$pageSize;
+
+        $list=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->limit($pageSize)->offset($offset)
+            ->get()->toArray();
+
+        $total=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->count();
+
+        return ['list'=>$list,'total'=>$total];
     }
 
     //精致车源
     private function module5(Request $request)
     {
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 5;
+        $topicBelong=2;
 
+        $offset=($page-1)*$pageSize;
+
+        $list=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->limit($pageSize)->offset($offset)
+            ->get()->toArray();
+
+        $total=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->count();
+
+        return ['list'=>$list,'total'=>$total];
     }
 
     //超值长租
     private function module6(Request $request)
     {
+        $page=$request->page ?? 1;
+        $pageSize=$request->pageSize ?? 5;
+        $topicBelong=3;
 
+        $offset=($page-1)*$pageSize;
+
+        $list=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->limit($pageSize)->offset($offset)
+            ->get()->toArray();
+
+        $total=topics::orderBy('level','desc')
+            ->where(['isShow'=>1,'topicBelong'=>$topicBelong])
+            ->count();
+
+        return ['list'=>$list,'total'=>$total];
     }
 
     //登录
