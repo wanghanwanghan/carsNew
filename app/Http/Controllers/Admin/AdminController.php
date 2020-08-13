@@ -1381,7 +1381,8 @@ class AdminController extends AdminBase
             $tmp['total']=DB::table('topics')->where('topicBelong',1)->count();
 
             $res=[
-                'AXTGList'=>$tmp
+                'AXTGList'=>$tmp,
+                'coverImage'=>Redis::hget('globalConf','module4')
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1399,6 +1400,8 @@ class AdminController extends AdminBase
                 'href'=>$request->href ?? '',//跳转地址
                 'contents'=>$request->contents ?? '空',//富文本
             ];
+
+            Redis::hset('globalConf','module4',$request->coverImage);
 
             try
             {
@@ -1439,6 +1442,8 @@ class AdminController extends AdminBase
 
         $topicInfo->save();
 
+        Redis::hset('globalConf','module4',$request->coverImage);
+
         return response()->json($this->createReturn(200,[]));
     }
 
@@ -1469,7 +1474,8 @@ class AdminController extends AdminBase
             $tmp['total']=DB::table('topics')->where('topicBelong',2)->count();
 
             $res=[
-                'AXTGList'=>$tmp
+                'JZCYList'=>$tmp,
+                'coverImage'=>Redis::hget('globalConf','module5')
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1487,6 +1493,8 @@ class AdminController extends AdminBase
                 'href'=>$request->href ?? '',//跳转地址
                 'contents'=>$request->contents ?? '空',//富文本
             ];
+
+            Redis::hset('globalConf','module5',$request->coverImage);
 
             try
             {
@@ -1527,6 +1535,8 @@ class AdminController extends AdminBase
 
         $topicInfo->save();
 
+        Redis::hset('globalConf','module5',$request->coverImage);
+
         return response()->json($this->createReturn(200,[]));
     }
 
@@ -1557,7 +1567,8 @@ class AdminController extends AdminBase
             $tmp['total']=DB::table('topics')->where('topicBelong',3)->count();
 
             $res=[
-                'AXTGList'=>$tmp
+                'CZCZList'=>$tmp,
+                'coverImage'=>Redis::hget('globalConf','module6')
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1575,6 +1586,8 @@ class AdminController extends AdminBase
                 'href'=>$request->href ?? '',//跳转地址
                 'contents'=>$request->contents ?? '空',//富文本
             ];
+
+            Redis::hset('globalConf','module6',$request->coverImage);
 
             try
             {
@@ -1614,6 +1627,8 @@ class AdminController extends AdminBase
         $topicInfo->contents=$contents;
 
         $topicInfo->save();
+
+        Redis::hset('globalConf','module6',$request->coverImage);
 
         return response()->json($this->createReturn(200,[]));
     }

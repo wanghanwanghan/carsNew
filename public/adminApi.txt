@@ -310,6 +310,7 @@
 参数:
      name = XXX，名称
      image = XXX，图片str
+     coverImage = XXX，封面图
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -334,6 +335,7 @@
      topicId = 1
      name = XXX
      image = XXX
+     coverImage = XXX，封面图
      isShow = 1
      level = 1
      type = 1
@@ -356,6 +358,7 @@
 参数:
      name = XXX，名称
      image = XXX，图片str
+     coverImage = XXX，封面图
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -380,6 +383,7 @@
      topicId = 1
      name = XXX
      image = XXX
+     coverImage = XXX，封面图
      isShow = 1
      level = 1
      type = 1
@@ -402,6 +406,7 @@
 参数:
      name = XXX，名称
      image = XXX，图片str
+     coverImage = XXX，封面图
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -426,6 +431,7 @@
      topicId = 1
      name = XXX
      image = XXX
+     coverImage = XXX，封面图
      isShow = 1
      level = 1
      type = 1
