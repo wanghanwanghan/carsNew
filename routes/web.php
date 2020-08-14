@@ -10,15 +10,5 @@ Route::group(['prefix'=>'admin'],function ()
 
 
 
-
-
-
-
-
-
-
-
-
-    Route::match(['get','post'],'excelTest','Admin\AdminBase@excelTest');//导出测试
 });
 

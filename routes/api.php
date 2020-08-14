@@ -51,6 +51,9 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'edit/CZCZ','Admin\AdminController@editCZCZ');
     Route::match(['get','post'],'delete/CZCZ','Admin\AdminController@deleteCZCZ');
 
+
+
+    Route::match(['get','post'],'export/order','Admin\AdminController@exportOrder');
 });
 
 //business

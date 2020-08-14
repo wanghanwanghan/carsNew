@@ -27,9 +27,4 @@ class AdminBase extends Controller
 
         return Arr::random($res);
     }
-
-    public function excelTest(Request $request, OrderExport $orderExport)
-    {
-        return $orderExport->exec();
-    }
 }

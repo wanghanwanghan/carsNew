@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\OrderExport;
 use App\Http\Models\banner;
 use App\Http\Models\bannerAction;
 use App\Http\Models\carBelong;
@@ -1646,6 +1647,15 @@ class AdminController extends AdminBase
         topics::where('id',$topicId)->delete();
 
         return response()->json($this->createReturn(200,[]));
+    }
+
+    public function exportOrder(Request $request)
+    {
+        $type=$request->type ?? '';
+
+        $orderExport=new OrderExport();
+
+        return $orderExport->exec();
     }
 
 
