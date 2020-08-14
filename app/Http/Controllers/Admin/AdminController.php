@@ -1658,6 +1658,16 @@ class AdminController extends AdminBase
         return $orderExport->exec();
     }
 
+    public function servicePhone(Request $request)
+    {
+        $phone=$request->phone ?? '4008-517-517';
+
+        Redis::hset('globalConf','tel',$phone);
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+
 
 
 
