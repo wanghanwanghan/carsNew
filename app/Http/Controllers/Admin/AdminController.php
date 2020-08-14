@@ -728,6 +728,11 @@ class AdminController extends AdminBase
                     $one['refundInfo']['damageRefund']=$damageRefund;
                     $one['refundInfo']['forfeitRefund']=$forfeitRefund;
 
+                    //如果退款任务里面有这个orderId，那么还是不可退的，每个订单只能退款一次
+                    $check=refundInfo::where(['orderId'=>$one['orderId']])->first();
+
+                    if ($check) $one['refundInfo']['canRefund']=0;
+
                 }elseif ($one['payment']==='违章押金')
                 {
                     //违章退了多少
