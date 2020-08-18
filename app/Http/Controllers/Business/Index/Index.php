@@ -1320,11 +1320,13 @@ class Index extends BusinessBase
             $one['coupon1Info']=coupon::where('id',$one['coupon1'])->get()->toArray();
 
             //取车时间
-            $test=$one['takeTime'];
-            $h=$test/60/60;
-            $m=$test - ((int)$h * 60 * 60);
-            $m=$m/60;
-            $one['takeTime']=str_pad((int)$h,2,'0',STR_PAD_LEFT).':'.str_pad((int)$m,2,'0',STR_PAD_LEFT);
+            //$test=$one['takeTime'];
+            //$h=$test/60/60;
+            //$m=$test - ((int)$h * 60 * 60);
+            //$m=$m/60;
+            //$one['takeTime']=str_pad((int)$h,2,'0',STR_PAD_LEFT).':'.str_pad((int)$m,2,'0',STR_PAD_LEFT);
+
+            $one['takeTime']=date('H:i',$one['startTime']);
         }
         unset($one);
 
