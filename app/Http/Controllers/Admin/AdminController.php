@@ -1657,6 +1657,12 @@ class AdminController extends AdminBase
         $orderType=$request->orderType ?? '';
         $orderStatus=$request->orderStatus ?? '';
 
+        Redis::set('exportOrder',json_encode([
+            'carBelongId'=>$carBelongId,
+            'orderType'=>$orderType,
+            'orderStatus'=>$orderStatus,
+        ]));
+
         $orderExport=new OrderExport([
             'carBelongId'=>$carBelongId,
             'orderType'=>$orderType,
