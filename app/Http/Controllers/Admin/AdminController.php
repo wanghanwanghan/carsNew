@@ -1653,9 +1653,15 @@ class AdminController extends AdminBase
 
     public function exportOrder(Request $request)
     {
-        $type=$request->type ?? '';
+        $carBelongId=$request->carBelongId ?? '';
+        $orderType=$request->orderType ?? '';
+        $orderStatus=$request->orderStatus ?? '';
 
-        $orderExport=new OrderExport();
+        $orderExport=new OrderExport([
+            'carBelongId'=>$carBelongId,
+            'orderType'=>$orderType,
+            'orderStatus'=>$orderStatus,
+        ]);
 
         return $orderExport->exec();
     }
