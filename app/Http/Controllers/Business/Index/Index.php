@@ -1030,6 +1030,10 @@ class Index extends BusinessBase
 
             $this->curl(['触发']);
 
+            $phone=(string)Redis::hget('adminConfig','notifyPhone');
+
+            SendSms::getInstance()->send(['newOrder',1],[$phone]);
+
         }catch (\Exception $e)
         {
             $code=201;

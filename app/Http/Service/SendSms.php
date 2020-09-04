@@ -13,6 +13,7 @@ class SendSms
     private $QiNiu_AK='TmTB5P36WqA5SxLsAgR1svRBfjNFtnIjGU0skHyk';
     private $QiNiu_SK='zo5nhyEv3JiX7bvXjEUOlWEobHXM1hAFnEKSOt6A';
     private $tempId_1='1278174705529925632';//验证码模版id
+    private $tempId_2='1278233044360114176';//新订单生成模版id
 
     public function send($type=['vCode',666666],$mobiles=[],$company='qiniu')
     {
@@ -49,6 +50,21 @@ class SendSms
                 try
                 {
                     $resp=$client->sendMessage($this->tempId_1,$mobiles,['code'=>last($type)]);
+
+                }catch (\Exception $e)
+                {
+                    $resp=false;
+                }
+
+                break;
+
+            case 'newOrder':
+
+                //新订单生成短信通知
+
+                try
+                {
+                    $resp=$client->sendMessage($this->tempId_2,$mobiles,['code'=>last($type)]);
 
                 }catch (\Exception $e)
                 {
