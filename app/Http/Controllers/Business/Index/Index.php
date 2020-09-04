@@ -1032,6 +1032,7 @@ class Index extends BusinessBase
 
             $phone=(string)Redis::hget('adminConfig','notifyPhone');
 
+            //短信通知
             SendSms::getInstance()->send(['newOrder',1],[$phone]);
 
         }catch (\Exception $e)
