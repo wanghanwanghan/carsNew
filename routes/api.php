@@ -11,6 +11,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'create/car','Admin\AdminController@createCar');//创建车辆
     Route::match(['get','post'],'edit/car','Admin\AdminController@editCar');//编辑车辆
     Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆
+    Route::match(['get','post'],'isShow/car','Admin\AdminController@isShowCar');//上架/下架
     Route::match(['get','post'],'create/carBelong','Admin\AdminController@createCarBelong');//创建车行
     Route::match(['get','post'],'edit/carBelong','Admin\AdminController@editCarBelong');//编辑车行
     Route::match(['get','post'],'delete/carBelong','Admin\AdminController@deleteCarBelong');//删除车行
@@ -18,6 +19,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'edit/carBrand','Admin\AdminController@editCarBrand');//修改品牌
     Route::match(['get','post'],'delete/carBrand','Admin\AdminController@deleteCarBrand');//删除品牌
     Route::match(['get','post'],'create/coupon','Admin\AdminController@createCoupon');//创建优惠券
+    Route::match(['get','post'],'delete/coupon','Admin\AdminController@deleteCoupon');//删除优惠券
     Route::match(['get','post'],'create/banner','Admin\AdminController@createBanner');//创建banner
     Route::match(['get','post'],'edit/banner','Admin\AdminController@editBanner');//修改banner
     Route::match(['get','post'],'delete/banner','Admin\AdminController@deleteBanner');//删除banner

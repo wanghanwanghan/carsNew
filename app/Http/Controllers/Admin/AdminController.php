@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
+use wanghanwanghan\someUtils\moudles\ioc\ioc;
 
 class AdminController extends AdminBase
 {
@@ -204,6 +205,7 @@ class AdminController extends AdminBase
         $carBelongArr=json_decode($request->carBelongArr,true);
         $carLabelArr=json_decode($request->carLabelArr,true);
         $carDesc=$request->carDesc;
+        $isShow=$request->isShow ?? 1;
 
         //搜索车型
         $carInfo=carModel::find($carModelId);
@@ -221,6 +223,7 @@ class AdminController extends AdminBase
         $carInfo->level=$level;
         $carInfo->kilPrice=$kilPrice;
         $carInfo->carDesc=$carDesc;
+        $carInfo->isShow=$isShow;
 
         $carInfo->save();
 
@@ -261,6 +264,20 @@ class AdminController extends AdminBase
 
         //删除订单表
         order::where('carModelId',$carModelId)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //上架/下架车辆
+    public function isShowCar(Request $request)
+    {
+        $carModelId=$request->carModelId;
+        $isShow=$request->isShow;
+
+        $info=carModel::find($carModelId);
+
+        $info->isShow=$isShow;
+        $info->save();
 
         return response()->json($this->createReturn(200,[]));
     }
@@ -317,6 +334,21 @@ class AdminController extends AdminBase
 
             return response()->json($this->createReturn($code));
         }
+    }
+
+    //删除优惠券
+    public function deleteCoupon(Request $request)
+    {
+        $couponId=$request->couponId;
+
+        $couponInfo=coupon::where(['id'=>$couponId,'isUse'=>0])->first();
+
+        if (empty($couponInfo)) return response()->json($this->createReturn(201,[],'未找到优惠券'));
+
+        $couponInfo->isShow=0;
+        $couponInfo->save();
+
+        return response()->json($this->createReturn(200));
     }
 
     //创建车行
@@ -893,27 +925,54 @@ class AdminController extends AdminBase
     {
         $licenseType=$request->licenseType ?? 1;
 
+        $cond=$request->cond ?? '';
+
         $offset=$this->offset($request);
 
-        $userInfo=users::where('isCarLicensePass',$licenseType)
-            ->orWhere('isMotorLicensePass',$licenseType)
-            ->orWhere('isIdCardPass',$licenseType)
-            ->orWhere('isPassportPass',$licenseType)
-            ->orderBy('updated_at')->offset(head($offset))->limit(last($offset))->get()->toArray();
-
-        $count=users::where('isCarLicensePass',$licenseType)
-            ->orWhere('isMotorLicensePass',$licenseType)
-            ->orWhere('isIdCardPass',$licenseType)
-            ->orWhere('isPassportPass',$licenseType)->count();
-
-        foreach ($userInfo as &$one)
+        if (empty($cond))
         {
-            if (is_numeric($one['oftenCity']))
+            $userInfo=users::where('isCarLicensePass',$licenseType)
+                ->orWhere('isMotorLicensePass',$licenseType)
+                ->orWhere('isIdCardPass',$licenseType)
+                ->orWhere('isPassportPass',$licenseType)
+                ->orderBy('updated_at')->offset(head($offset))->limit(last($offset))->get()->toArray();
+
+            $count=users::where('isCarLicensePass',$licenseType)
+                ->orWhere('isMotorLicensePass',$licenseType)
+                ->orWhere('isIdCardPass',$licenseType)
+                ->orWhere('isPassportPass',$licenseType)->count();
+
+            foreach ($userInfo as &$one)
             {
-                $one['oftenCity']=chinaArea::find($one['oftenCity']);
+                if (is_numeric($one['oftenCity']))
+                {
+                    $one['oftenCity']=chinaArea::find($one['oftenCity']);
+                }
+            }
+            unset($one);
+
+        }else
+        {
+            $userInfo=users::where('phone',$cond)->first();
+
+            if (empty($userInfo))
+            {
+                $userInfo=[];
+                $count=0;
+            }else
+            {
+                $userInfo=$userInfo->toArray();
+
+                if (is_numeric($userInfo['oftenCity']))
+                {
+                    $userInfo['oftenCity']=chinaArea::find($userInfo['oftenCity']);
+                }
+
+                $userInfo=[$userInfo];
+
+                $count=1;
             }
         }
-        unset($one);
 
         $tmp['list']=$userInfo;
         $tmp['total']=$count;

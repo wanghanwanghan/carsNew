@@ -242,7 +242,7 @@ class Index extends BusinessBase
         if (empty($lng) || empty($lat))
         {
             //展示所有车型
-            $all=carModel::whereIn('carType',[1,2]);
+            $all=carModel::whereIn('carType',[1,2])->where('isShow',1);
 
             switch ($orderBy)
             {
@@ -336,7 +336,7 @@ class Index extends BusinessBase
             //然后从订单表中计算这个车行有多少车被订出去了
             $carModelId=$this->getCarInfoIdByTimeRange($start,$stop,[$carBelongId],$orderType);
 
-            $carModel=carModel::whereIn('carType',[1,2])->whereIn('id',$carModelId);
+            $carModel=carModel::whereIn('carType',[1,2])->whereIn('id',$carModelId)->where('isShow',1);
 
             if (!empty($cond))
             {

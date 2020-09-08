@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd160f930a295177f73abc9b1d878cd9",
+    "content-hash": "f5c8e3387ffe7579c5a841b41cdfe572",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2465,12 +2465,12 @@
             "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nrk/predis.git",
+                "url": "https://github.com/predis/predis.git",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "url": "https://api.github.com/repos/predis/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "shasum": "",
                 "mirrors": [
@@ -5632,16 +5632,16 @@
         },
         {
             "name": "wanghanwanghan/someutils",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wanghanwanghan/someUtils.git",
-                "reference": "c19ad88e0f28cbf97745f740d24da65dc217cf0a"
+                "reference": "0f5b50d97b1f6a971583983042c7fd404f661a55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/c19ad88e0f28cbf97745f740d24da65dc217cf0a",
-                "reference": "c19ad88e0f28cbf97745f740d24da65dc217cf0a",
+                "url": "https://api.github.com/repos/wanghanwanghan/someUtils/zipball/0f5b50d97b1f6a971583983042c7fd404f661a55",
+                "reference": "0f5b50d97b1f6a971583983042c7fd404f661a55",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5653,7 +5653,8 @@
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "ext-openssl": "*"
+                "ext-openssl": "*",
+                "php": ">=7.2.0"
             },
             "type": "library",
             "autoload": {
@@ -5672,7 +5673,7 @@
                 }
             ],
             "description": "2020-06-19 start coding",
-            "time": "2020-08-03T01:56:02+00:00"
+            "time": "2020-09-04T03:55:17+00:00"
         },
         {
             "name": "yansongda/laravel-pay",
@@ -7891,7 +7892,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^7.1.3",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
