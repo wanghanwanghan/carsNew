@@ -345,8 +345,7 @@ class AdminController extends AdminBase
 
         if (empty($couponInfo)) return response()->json($this->createReturn(201,[],'未找到优惠券'));
 
-        $couponInfo->isShow=0;
-        $couponInfo->save();
+        $couponInfo->delete();
 
         return response()->json($this->createReturn(200));
     }
