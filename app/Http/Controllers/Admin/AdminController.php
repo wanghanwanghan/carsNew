@@ -159,6 +159,7 @@ class AdminController extends AdminBase
                 'goPrice'=>$request->goPrice ?? 3000,//出行价格
                 'goDiscount'=>$request->goDiscount ?? 0,//出行折扣
                 'kilPrice'=>$request->kilPrice ?? 0,//每公里价格
+                'isShow'=>$request->isShow ?? 0,//
             ];
 
             try
