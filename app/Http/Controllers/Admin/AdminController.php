@@ -104,6 +104,7 @@ class AdminController extends AdminBase
 
             $carModelList=DB::table('carModel');
 
+            if (!empty($request->isShow)) $carModelList->where('isShow',$request->isShow);
             if (!empty($request->carBrand)) $carModelList->where('carBrand',$request->carBrandId);
 
             $tmp=[];
