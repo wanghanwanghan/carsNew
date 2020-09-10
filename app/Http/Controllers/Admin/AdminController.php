@@ -33,7 +33,6 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use wanghanwanghan\someUtils\control;
-use wanghanwanghan\someUtils\moudles\ioc\ioc;
 
 class AdminController extends AdminBase
 {
@@ -52,6 +51,50 @@ class AdminController extends AdminBase
             response()->json($this->createReturn(201,[],'用户名密码错误')) :
             response()->json($this->createReturn(200,$check,'登录成功'));
     }
+
+    //注册
+    public function reg(Request $request)
+    {
+        $name=$request->name ?? control::getUuid(8);
+        $username=$request->username ?? control::getUuid(8);
+        $password=$request->password ?? control::getUuid(8);
+        $phone=$request->phone ?? control::getUuid(11);
+        $type=$request->type ?? 1;
+
+        DB::table('admin_users')->insert([
+            'name'=>$name,
+            'username'=>$username,
+            'password'=>$password,
+            'phone'=>$phone,
+            'type'=>$type,
+        ]);
+
+        return response()->json($this->createReturn(200,[],'注册成功'));
+    }
+
+    //后台用户列表
+    public function getAdminUserList(Request $request)
+    {
+        $res=DB::table('admin_users')->get()->toArray();
+
+        return response()->json($this->createReturn(200,$res,''));
+    }
+
+    //修改后台用户
+    public function editUser(Request $request)
+    {
+        DB::table('admin_users')->where('id',$request->id)->update([
+            'name'=>$request->name,
+            'username'=>$request->username,
+            'password'=>$request->password,
+            'phone'=>$request->phone,
+            'type'=>$request->type,
+        ]);
+
+        return response()->json($this->createReturn(200,[],''));
+    }
+
+
 
     //上传图片
     public function uploadImg(Request $request)
@@ -1450,7 +1493,9 @@ class AdminController extends AdminBase
 
             $res=[
                 'AXTGList'=>$tmp,
-                'coverImage'=>Redis::hget('globalConf','module4')
+                'coverName'=>Redis::hget('globalConf','module4CoverName'),
+                'coverWord'=>json_decode(Redis::hget('globalConf','module4CoverWord'),true),
+                'coverImage'=>Redis::hget('globalConf','module4'),
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1469,6 +1514,8 @@ class AdminController extends AdminBase
                 'contents'=>$request->contents ?? '空',//富文本
             ];
 
+            Redis::hset('globalConf','module4CoverName',$request->coverName);
+            Redis::hset('globalConf','module4CoverWord',json_encode(explode(',',$request->coverWord)));
             Redis::hset('globalConf','module4',$request->coverImage);
 
             try
@@ -1510,6 +1557,8 @@ class AdminController extends AdminBase
 
         $topicInfo->save();
 
+        Redis::hset('globalConf','module4CoverName',$request->coverName);
+        Redis::hset('globalConf','module4CoverWord',json_encode(explode(',',$request->coverWord)));
         Redis::hset('globalConf','module4',$request->coverImage);
 
         return response()->json($this->createReturn(200,[]));
@@ -1543,7 +1592,9 @@ class AdminController extends AdminBase
 
             $res=[
                 'JZCYList'=>$tmp,
-                'coverImage'=>Redis::hget('globalConf','module5')
+                'coverName'=>Redis::hget('globalConf','module5CoverName'),
+                'coverWord'=>json_decode(Redis::hget('globalConf','module5CoverWord'),true),
+                'coverImage'=>Redis::hget('globalConf','module5'),
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1562,6 +1613,8 @@ class AdminController extends AdminBase
                 'contents'=>$request->contents ?? '空',//富文本
             ];
 
+            Redis::hset('globalConf','module5CoverName',$request->coverName);
+            Redis::hset('globalConf','module5CoverWord',json_encode(explode(',',$request->coverWord)));
             Redis::hset('globalConf','module5',$request->coverImage);
 
             try
@@ -1603,6 +1656,8 @@ class AdminController extends AdminBase
 
         $topicInfo->save();
 
+        Redis::hset('globalConf','module5CoverName',$request->coverName);
+        Redis::hset('globalConf','module5CoverWord',json_encode(explode(',',$request->coverWord)));
         Redis::hset('globalConf','module5',$request->coverImage);
 
         return response()->json($this->createReturn(200,[]));
@@ -1636,7 +1691,9 @@ class AdminController extends AdminBase
 
             $res=[
                 'CZCZList'=>$tmp,
-                'coverImage'=>Redis::hget('globalConf','module6')
+                'coverName'=>Redis::hget('globalConf','module6CoverName'),
+                'coverWord'=>json_decode(Redis::hget('globalConf','module6CoverWord'),true),
+                'coverImage'=>Redis::hget('globalConf','module6'),
             ];
 
             return response()->json($this->createReturn(200,$res));
@@ -1655,6 +1712,8 @@ class AdminController extends AdminBase
                 'contents'=>$request->contents ?? '空',//富文本
             ];
 
+            Redis::hset('globalConf','module6CoverName',$request->coverName);
+            Redis::hset('globalConf','module6CoverWord',json_encode(explode(',',$request->coverWord)));
             Redis::hset('globalConf','module6',$request->coverImage);
 
             try
@@ -1696,6 +1755,8 @@ class AdminController extends AdminBase
 
         $topicInfo->save();
 
+        Redis::hset('globalConf','module6CoverName',$request->coverName);
+        Redis::hset('globalConf','module6CoverWord',json_encode(explode(',',$request->coverWord)));
         Redis::hset('globalConf','module6',$request->coverImage);
 
         return response()->json($this->createReturn(200,[]));

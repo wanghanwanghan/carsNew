@@ -316,6 +316,8 @@
      name = XXX，名称
      image = XXX，图片str
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -341,6 +343,8 @@
      name = XXX
      image = XXX
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      isShow = 1
      level = 1
      type = 1
@@ -364,6 +368,8 @@
      name = XXX，名称
      image = XXX，图片str
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -389,6 +395,8 @@
      name = XXX
      image = XXX
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      isShow = 1
      level = 1
      type = 1
@@ -412,6 +420,8 @@
      name = XXX，名称
      image = XXX，图片str
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      level = 100，权重
      isShow = 1，是否显示
      type = 1，1是页面，2是公众号文章
@@ -437,6 +447,8 @@
      name = XXX
      image = XXX
      coverImage = XXX，封面图
+     coverName = XXX，封面名称
+     coverWord = XXX，封面文字，两行的话，用逗号分割，传字符串就行
      isShow = 1
      level = 1
      type = 1
@@ -477,6 +489,41 @@
 参数:
      couponId = 1，优惠券id，用过的不能删除
 ======================================================================================================
+
+======================================================================================================
+描述:注册
+地址:https://jikecardata.bobocar.cn/api/admin/reg
+方法:get/post
+参数:
+     name = 黄骚超
+     username = huangsaochaodezhanghao
+     password = huangsaochaodemima
+     phone = 13800138000
+     type = 1，1是超级管理员，2是管理员，3是普通
+======================================================================================================
+
+======================================================================================================
+描述:后台用户列表
+地址:https://jikecardata.bobocar.cn/api/admin/get/adminUser
+方法:get/post
+参数:
+     无
+======================================================================================================
+
+======================================================================================================
+描述:修改后台用户
+地址:https://jikecardata.bobocar.cn/api/admin/edit/user
+方法:get/post
+参数:
+     id = 1，主键
+     name = 黄骚超
+     username = huangsaochaodezhanghao
+     password = huangsaochaodemima
+     phone = 13800138000
+     type = 1，1是超级管理员，2是管理员，3是普通
+======================================================================================================
+
+
 
 
 
