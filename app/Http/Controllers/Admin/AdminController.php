@@ -81,7 +81,10 @@ class AdminController extends AdminBase
             ->limit(last($pageInfo))->offset(head($pageInfo))
             ->get()->toArray();
 
-        return response()->json($this->createReturn(200,$res,''));
+        $tmp['list']=$res;
+        $tmp['total']=DB::table('admin_users')->count();
+
+        return response()->json($this->createReturn(200,$tmp,''));
     }
 
     //修改后台用户
