@@ -13,16 +13,18 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'paginate','Admin\AdminController@paginate');//公共分页
     Route::match(['get','post'],'create/car','Admin\AdminController@createCar');//创建车辆
     Route::match(['get','post'],'edit/car','Admin\AdminController@editCar');//编辑车辆
-    //Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆
+    //Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆，改成isShow了
     Route::match(['get','post'],'isShow/car','Admin\AdminController@isShowCar');//上架/下架
     Route::match(['get','post'],'create/carBelong','Admin\AdminController@createCarBelong');//创建车行
     Route::match(['get','post'],'edit/carBelong','Admin\AdminController@editCarBelong');//编辑车行
-    Route::match(['get','post'],'delete/carBelong','Admin\AdminController@deleteCarBelong');//删除车行
+    Route::match(['get','post'],'delete/carBelong','Admin\AdminController@deleteCarBelong');//删除车行，判断有没有关联的车
+    Route::match(['get','post'],'edit/carRelationWithBelong','Admin\AdminController@carRelationWithBelong');//修改车和车行的关系
     Route::match(['get','post'],'create/carBrand','Admin\AdminController@createCarBrand');//创建品牌
     Route::match(['get','post'],'edit/carBrand','Admin\AdminController@editCarBrand');//修改品牌
-    Route::match(['get','post'],'delete/carBrand','Admin\AdminController@deleteCarBrand');//删除品牌
+    Route::match(['get','post'],'delete/carBrand','Admin\AdminController@deleteCarBrand');//删除品牌，判断有没有关联的车
+    Route::match(['get','post'],'edit/carRelationWithBrand','Admin\AdminController@carRelationWithBrand');//修改车和品牌的关系
     Route::match(['get','post'],'create/coupon','Admin\AdminController@createCoupon');//创建优惠券
-    Route::match(['get','post'],'delete/coupon','Admin\AdminController@deleteCoupon');//删除优惠券
+    Route::match(['get','post'],'delete/coupon','Admin\AdminController@deleteCoupon');//删除优惠券，删除未使用的，所以不影响订单
     Route::match(['get','post'],'create/banner','Admin\AdminController@createBanner');//创建banner
     Route::match(['get','post'],'edit/banner','Admin\AdminController@editBanner');//修改banner
     Route::match(['get','post'],'delete/banner','Admin\AdminController@deleteBanner');//删除banner
@@ -37,7 +39,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'setRemark/order','Admin\AdminController@setRemarkOrder');//修改订单的备注
     Route::match(['get','post'],'get/purchase','Admin\AdminController@getPurchaseList');//充值页面
     Route::match(['get','post'],'index','Admin\AdminController@index');//首页
-    Route::match(['get','post'],'edit/notifyPhone','Admin\AdminController@editNotifyPhone');//首页
+    Route::match(['get','post'],'edit/notifyPhone','Admin\AdminController@editNotifyPhone');
     Route::match(['get','post'],'getOrderNumByStatus','Admin\AdminController@getOrderNumByStatus');
     Route::match(['get','post'],'setRentPersonInfo/order','Admin\AdminController@setRentPersonInfo');
     Route::match(['get','post'],'create/label','Admin\AdminController@createLabel');

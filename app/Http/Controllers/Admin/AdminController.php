@@ -77,7 +77,9 @@ class AdminController extends AdminBase
     {
         $pageInfo=$this->offset($request);
 
-        $res=DB::table('admin_users')->limit(head($pageInfo))->offset(last($pageInfo))->get()->toArray();
+        $res=DB::table('admin_users')
+            ->limit(head($pageInfo))->offset(last($pageInfo))
+            ->get()->toArray();
 
         return response()->json($this->createReturn(200,$res,''));
     }
@@ -95,8 +97,6 @@ class AdminController extends AdminBase
 
         return response()->json($this->createReturn(200,[],''));
     }
-
-
 
     //上传图片
     public function uploadImg(Request $request)
@@ -295,7 +295,7 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
-    //删除车
+    //删除车 不删了
     public function deleteCar(Request $request)
     {
         $carModelId=$request->carModelId;
@@ -496,16 +496,15 @@ class AdminController extends AdminBase
     {
         $carBelongId=$request->carBelongId;
 
+        //有关联的车就不能删
+        $hasCarArr=carModelCarBelong::where('carBelongId',$carBelongId)->get()->toArray();
+
+        if (!empty($hasCarArr)) return response()->json($this->createReturn(201,$hasCarArr,'车行中还有关联的车'));
+
         //删除车行
         carBelong::where('id',$carBelongId)->delete();
 
-        //车行里相关的车全删了
-        carModelCarBelong::where('carBelongId',$carBelongId)->delete();
-
-        //删除这个车行里所有的订单
-        order::where('carBelongId',$carBelongId)->delete();
-
-        return response()->json($this->createReturn(200,[]));
+        return response()->json($this->createReturn(200,[]),'删除车行成功');
     }
 
     //创建车辆品牌
@@ -569,22 +568,15 @@ class AdminController extends AdminBase
     {
         $carBrandId=$request->carBrandId;
 
+        //有关联的车就不能删
+        $hasCarArr=carModel::where('carBrandId',$carBrandId)->get()->toArray();
+
+        if (!empty($hasCarArr)) return response()->json($this->createReturn(201,$hasCarArr,'品牌中还有关联的车'));
+
         //删除品牌
         carBrand::where('id',$carBrandId)->delete();
 
-        //得到要删除的车的id
-        $carModelId=carModel::where('carBrandId',$carBrandId)->get(['id'])->toArray();
-        $carModelId=Arr::flatten($carModelId);
-
-        //删除品牌里的车
-        carModel::where('carBrandId',$carBrandId)->delete();
-
-        //删除与车关联的表中数据
-        carModelCarBelong::whereIn('carModelId',$carModelId)->delete();
-        carModelLabel::whereIn('carModelId',$carModelId)->delete();
-        order::whereIn('carModelId',$carModelId)->delete();
-
-        return response()->json($this->createReturn(200,[]));
+        return response()->json($this->createReturn(200,[],'删除品牌成功'));
     }
 
     //创建banner
@@ -1774,6 +1766,7 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //导出订单
     public function exportOrder(Request $request)
     {
         $carBelongId=$request->carBelongId ?? '';
@@ -1795,6 +1788,7 @@ class AdminController extends AdminBase
         return $orderExport->exec();
     }
 
+    //修改手机号
     public function servicePhone(Request $request)
     {
         $phone=$request->phone ?? '4008-517-517';
@@ -1804,6 +1798,33 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //修改车辆关联的品牌
+    public function carRelationWithBrand(Request $request)
+    {
+        $carModelId=$request->carModelId;
+        $carBrandId=$request->carBrandId;
+
+        $info=carModel::where('id',$carModelId)->first();
+        $info->carBrandId=$carBrandId;
+        $info->save();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
+    //修改车辆关联的车行
+    public function carRelationWithBelong(Request $request)
+    {
+        $carModelId=$request->carModelId;
+        $carBelongIdOld=$request->carBelongIdOld;
+        $carBelongIdNew=$request->carBelongIdNew;
+        $carNum=$request->carNum;
+
+        carModelCarBelong::updateOrCreate(['carModelId'=>$carModelId,'carBelongId'=>$carBelongIdNew],['carNum'=>$carNum]);
+
+        carModelCarBelong::where(['carModelId'=>$carModelId,'carBelongId'=>$carBelongIdOld])->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
 
 
 
