@@ -13,7 +13,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'paginate','Admin\AdminController@paginate');//公共分页
     Route::match(['get','post'],'create/car','Admin\AdminController@createCar');//创建车辆
     Route::match(['get','post'],'edit/car','Admin\AdminController@editCar');//编辑车辆
-    Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆
+    //Route::match(['get','post'],'delete/car','Admin\AdminController@deleteCar');//删除车辆
     Route::match(['get','post'],'isShow/car','Admin\AdminController@isShowCar');//上架/下架
     Route::match(['get','post'],'create/carBelong','Admin\AdminController@createCarBelong');//创建车行
     Route::match(['get','post'],'edit/carBelong','Admin\AdminController@editCarBelong');//编辑车行

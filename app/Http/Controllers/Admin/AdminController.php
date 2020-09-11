@@ -75,7 +75,9 @@ class AdminController extends AdminBase
     //后台用户列表
     public function getAdminUserList(Request $request)
     {
-        $res=DB::table('admin_users')->get()->toArray();
+        $pageInfo=$this->offset($request);
+
+        $res=DB::table('admin_users')->limit(head($pageInfo))->offset(last($pageInfo))->get()->toArray();
 
         return response()->json($this->createReturn(200,$res,''));
     }
