@@ -78,7 +78,7 @@ class AdminController extends AdminBase
         $pageInfo=$this->offset($request);
 
         $res=DB::table('admin_users')
-            ->limit(head($pageInfo))->offset(last($pageInfo))
+            ->limit(last($pageInfo))->offset(head($pageInfo))
             ->get()->toArray();
 
         return response()->json($this->createReturn(200,$res,''));
