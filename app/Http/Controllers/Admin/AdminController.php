@@ -339,7 +339,7 @@ class AdminController extends AdminBase
         {
             //刚打开页面
 
-            $couponType=['自驾','出行','摩托'];
+            $couponType=['自驾','出行','摩托','全部'];
             $discount=['折扣减免','金额减免'];
 
             $pageInfo=$this->offset($request);

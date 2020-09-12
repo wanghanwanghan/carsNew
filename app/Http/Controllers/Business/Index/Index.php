@@ -785,7 +785,7 @@ class Index extends BusinessBase
         ];
 
         //找出哪些优惠券可用
-        $couponInfo=coupon::where('phone',$phone)->where('couponType',$orderType)->where('isUse',0)->get()->toArray();
+        $couponInfo=coupon::where('phone',$phone)->whereIn('couponType',[$orderType,'全部'])->where('isUse',0)->get()->toArray();
 
         $available=$disabled=[];
 
