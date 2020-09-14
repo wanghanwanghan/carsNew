@@ -8,6 +8,7 @@ Route::group(['prefix'=>'admin'],function ()
     Route::match(['get','post'],'reg','Admin\AdminController@reg');//注册
     Route::match(['get','post'],'get/adminUser','Admin\AdminController@getAdminUserList');//后台用户列表
     Route::match(['get','post'],'edit/user','Admin\AdminController@editUser');//修改后台用户
+    Route::match(['get','post'],'delete/user','Admin\AdminController@deleteUser');//修改后台用户
     Route::match(['get','post'],'login','Admin\AdminController@login');//登录
     Route::match(['get','post'],'uploadImg','Admin\AdminController@uploadImg');//上传图片
     Route::match(['get','post'],'paginate','Admin\AdminController@paginate');//公共分页

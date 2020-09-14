@@ -1829,6 +1829,14 @@ class AdminController extends AdminBase
         return response()->json($this->createReturn(200,[]));
     }
 
+    //删除后台用户
+    public function deleteUser(Request $request)
+    {
+        DB::table('admin_users')->where('id',$request->id)->delete();
+
+        return response()->json($this->createReturn(200,[]));
+    }
+
 
 
 
