@@ -507,7 +507,7 @@ class AdminController extends AdminBase
         //删除车行
         carBelong::where('id',$carBelongId)->delete();
 
-        return response()->json($this->createReturn(200,[]),'删除车行成功');
+        return response()->json($this->createReturn(200,[],'删除车行成功'));
     }
 
     //创建车辆品牌
